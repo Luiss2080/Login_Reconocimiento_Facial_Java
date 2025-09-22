@@ -55,6 +55,7 @@ public class FormularioRegistroCompleto extends JFrame {
     private static final int MUESTRAS_REQUERIDAS = 5;
     private boolean camaraActiva = false;
     private boolean capturaEnProceso = false;
+    private javax.swing.Timer videoTimer; // Timer para actualizar video en tiempo real
 
     // ========== CONSTANTES DE DISEÑO PROFESIONAL ==========
     private static final Color COLOR_PRINCIPAL = new Color(52, 73, 94);      // Azul oscuro profesional
@@ -468,10 +469,29 @@ public class FormularioRegistroCompleto extends JFrame {
      */
     private void configurarVentana() {
         setTitle("Registro de Usuario - Sistema de Reconocimiento Facial");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
         setResizable(false);
+        
+        // Agregar listener para limpiar recursos al cerrar
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                limpiarRecursos();
+                System.exit(0);
+            }
+        });
+    }
+    
+    /**
+     * 🧹 Limpiar recursos antes de cerrar
+     */
+    private void limpiarRecursos() {
+        detenerStreamVideo();
+        if (manejadorCamara != null) {
+            manejadorCamara.liberarCamara();
+        }
     }
 
     /**
@@ -519,9 +539,10 @@ public class FormularioRegistroCompleto extends JFrame {
                             btnActivarCamara.setText("CÁMARA ACTIVA");
                             btnActivarCamara.setEnabled(false);
                             btnCapturarMuestra.setEnabled(true);
-                            lblCamara.setText("ACTIVA");
+                            lblCamara.setText("🎥 TRANSMITIENDO");
                             lblCamara.setBackground(COLOR_SECUNDARIO);
                             actualizarEstado("Cámara activa - Listo para captura");
+                            iniciarStreamVideo(); // Iniciar stream de video
                         } else {
                             mostrarError("No se pudo activar la cámara");
                         }
@@ -549,17 +570,8 @@ public class FormularioRegistroCompleto extends JFrame {
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<BufferedImage, Void>() {
             @Override
             protected BufferedImage doInBackground() throws Exception {
-                // Simular captura (reemplazar con implementación real)
-                Thread.sleep(1000); // Simular tiempo de captura
-                // return manejadorCamara.capturarImagen();
-                
-                // Por ahora crear una imagen simulada
-                BufferedImage imagen = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g2d = imagen.createGraphics();
-                g2d.setColor(new Color((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
-                g2d.fillRect(0, 0, 200, 200);
-                g2d.dispose();
-                return imagen;
+                // Captura real de la cámara
+                return manejadorCamara.capturarImagenBuffered();
             }
             
             @Override
@@ -838,6 +850,77 @@ public class FormularioRegistroCompleto extends JFrame {
             lblEstado.setForeground(COLOR_PELIGRO);
             JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
         });
+    }
+
+    /**
+     * 🎥 Iniciar stream de video en tiempo real
+     */
+    private void iniciarStreamVideo() {
+        if (videoTimer != null) {
+            videoTimer.stop();
+        }
+        
+        // Timer para actualizar el video cada 50ms (20 FPS)
+        videoTimer = new javax.swing.Timer(50, e -> actualizarFrameVideo());
+        videoTimer.start();
+        
+        System.out.println("🎥 Stream de video iniciado");
+    }
+    
+    /**
+     * 🔄 Actualizar frame de video
+     */
+    private void actualizarFrameVideo() {
+        if (!camaraActiva) {
+            return;
+        }
+        
+        SwingUtilities.invokeLater(() -> {
+            try {
+                BufferedImage imagen = manejadorCamara.capturarImagenBuffered();
+                if (imagen != null) {
+                    // Escalar imagen para mostrar en el label
+                    Image imagenEscalada = imagen.getScaledInstance(
+                        lblCamara.getWidth() - 10, 
+                        lblCamara.getHeight() - 10, 
+                        Image.SCALE_FAST
+                    );
+                    
+                    // Crear ImageIcon y asignarlo al label
+                    ImageIcon icon = new ImageIcon(imagenEscalada);
+                    lblCamara.setIcon(icon);
+                    lblCamara.setText(""); // Quitar el texto para mostrar solo la imagen
+                    
+                } else {
+                    // Si no hay imagen, mostrar mensaje de error
+                    lblCamara.setIcon(null);
+                    lblCamara.setText("❌ ERROR EN CÁMARA");
+                    lblCamara.setBackground(COLOR_PELIGRO);
+                }
+                
+            } catch (Exception ex) {
+                System.err.println("❌ Error actualizando video: " + ex.getMessage());
+                lblCamara.setIcon(null);
+                lblCamara.setText("⚠️ ERROR VIDEO");
+            }
+        });
+    }
+    
+    /**
+     * 🛑 Detener stream de video
+     */
+    private void detenerStreamVideo() {
+        if (videoTimer != null) {
+            videoTimer.stop();
+            videoTimer = null;
+        }
+        
+        // Limpiar el label
+        lblCamara.setIcon(null);
+        lblCamara.setText("CÁMARA DETENIDA");
+        lblCamara.setBackground(new Color(245, 245, 245));
+        
+        System.out.println("🛑 Stream de video detenido");
     }
 
     /**

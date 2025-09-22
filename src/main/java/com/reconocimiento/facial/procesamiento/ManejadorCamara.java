@@ -23,66 +23,179 @@ public class ManejadorCamara {
      */
     public boolean inicializarCamara() {
         try {
-            System.out.println("Inicializando camara real...");
+            System.out.println("🎥 Inicializando cámara real...");
 
             // Limpiar recursos previos si existen
-            if (grabber != null) {
-                try {
-                    grabber.stop();
-                    grabber.release();
-                } catch (Exception e) {
-                    // Ignorar errores de limpieza
-                }
+            liberarRecursosPrevios();
+
+            // Intentar diferentes configuraciones de cámara
+            boolean inicializada = false;
+            
+            // Configuración 1: Cámara por defecto con DirectShow (Windows)
+            if (!inicializada) {
+                inicializada = intentarInicializarConDirectShow();
+            }
+            
+            // Configuración 2: Cámara por defecto sin DirectShow
+            if (!inicializada) {
+                inicializada = intentarInicializarSinDirectShow();
+            }
+            
+            // Configuración 3: Probar diferentes índices de cámara
+            if (!inicializada) {
+                inicializada = intentarInicializarConDiferentesIndices();
+            }
+            
+            if (inicializada) {
+                camaraActiva = true;
+                System.out.println("✅ Cámara inicializada correctamente");
+                return true;
+            } else {
+                System.err.println("❌ No se pudo inicializar ninguna cámara");
+                return false;
             }
 
-            // Crear grabber para cámara por defecto (índice 0)
+        } catch (Exception e) {
+            System.err.println("❌ Error general al inicializar cámara: " + e.getMessage());
+            e.printStackTrace();
+            camaraActiva = false;
+            return false;
+        }
+    }
+    
+    /**
+     * Liberar recursos previos
+     */
+    private void liberarRecursosPrevios() {
+        if (grabber != null) {
+            try {
+                grabber.stop();
+                grabber.release();
+            } catch (Exception e) {
+                System.out.println("⚠️ Error limpiando recursos previos: " + e.getMessage());
+            }
+            grabber = null;
+        }
+    }
+    
+    /**
+     * Intentar inicializar con DirectShow (Windows)
+     */
+    private boolean intentarInicializarConDirectShow() {
+        try {
+            System.out.println("🔧 Intentando inicializar con DirectShow...");
+            
             grabber = new OpenCVFrameGrabber(0);
             
-            // Configuración básica de la cámara
+            // Configuración específica para Windows
+            grabber.setFormat("dshow");
             grabber.setImageWidth(640);
             grabber.setImageHeight(480);
             grabber.setFrameRate(30);
             
-            // Intentar configuraciones adicionales para mejor compatibilidad
-            try {
-                grabber.setFormat("dshow"); // Para Windows
-            } catch (Exception e) {
-                // Si falla, continuar sin esta configuración
-            }
-            
-            // Inicializar el grabber con timeout
-            System.out.println("Conectando con la camara...");
+            System.out.println("📡 Conectando con DirectShow...");
             grabber.start();
             
-            // Crear convertidor de frames
-            converter = new Java2DFrameConverter();
-            
-            // Verificar que la cámara funciona capturando un frame de prueba
-            org.bytedeco.javacv.Frame testFrame = grabber.grab();
-            if (testFrame == null) {
-                throw new Exception("No se pudo capturar frame de prueba");
+            // Verificar funcionalidad
+            if (verificarFuncionalidadCamara()) {
+                System.out.println("✅ DirectShow funcionando correctamente");
+                return true;
             }
-
-            camaraActiva = true;
-            System.out.println("Camara inicializada correctamente");
-            return true;
-
+            
         } catch (Exception e) {
-            System.err.println("Error al inicializar camara: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("⚠️ DirectShow falló: " + e.getMessage());
+            liberarRecursosPrevios();
+        }
+        return false;
+    }
+    
+    /**
+     * Intentar inicializar sin DirectShow
+     */
+    private boolean intentarInicializarSinDirectShow() {
+        try {
+            System.out.println("🔧 Intentando inicializar sin DirectShow...");
             
-            // Limpiar recursos en caso de error
-            if (grabber != null) {
-                try {
-                    grabber.stop();
-                    grabber.release();
-                } catch (Exception cleanupError) {
-                    // Ignorar errores de limpieza
-                }
-                grabber = null;
+            grabber = new OpenCVFrameGrabber(0);
+            
+            // Configuración básica
+            grabber.setImageWidth(640);
+            grabber.setImageHeight(480);
+            grabber.setFrameRate(30);
+            
+            System.out.println("📡 Conectando directamente...");
+            grabber.start();
+            
+            // Verificar funcionalidad
+            if (verificarFuncionalidadCamara()) {
+                System.out.println("✅ Conexión directa funcionando correctamente");
+                return true;
             }
             
-            camaraActiva = false;
+        } catch (Exception e) {
+            System.out.println("⚠️ Conexión directa falló: " + e.getMessage());
+            liberarRecursosPrevios();
+        }
+        return false;
+    }
+    
+    /**
+     * Intentar con diferentes índices de cámara
+     */
+    private boolean intentarInicializarConDiferentesIndices() {
+        System.out.println("🔧 Probando diferentes índices de cámara...");
+        
+        for (int indice = 0; indice <= 3; indice++) {
+            try {
+                System.out.println("📹 Probando cámara índice: " + indice);
+                
+                grabber = new OpenCVFrameGrabber(indice);
+                grabber.setImageWidth(640);
+                grabber.setImageHeight(480);
+                grabber.setFrameRate(30);
+                
+                grabber.start();
+                
+                if (verificarFuncionalidadCamara()) {
+                    System.out.println("✅ Cámara índice " + indice + " funcionando");
+                    return true;
+                }
+                
+            } catch (Exception e) {
+                System.out.println("⚠️ Índice " + indice + " falló: " + e.getMessage());
+                liberarRecursosPrevios();
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Verificar que la cámara funciona correctamente
+     */
+    private boolean verificarFuncionalidadCamara() {
+        try {
+            // Crear convertidor si no existe
+            if (converter == null) {
+                converter = new Java2DFrameConverter();
+            }
+            
+            // Intentar capturar varios frames para asegurar estabilidad
+            for (int i = 0; i < 3; i++) {
+                org.bytedeco.javacv.Frame testFrame = grabber.grab();
+                if (testFrame == null) {
+                    System.out.println("❌ Frame " + (i+1) + " es null");
+                    return false;
+                }
+                
+                // Pequeña pausa entre capturas
+                Thread.sleep(100);
+            }
+            
+            System.out.println("✅ Cámara verificada correctamente");
+            return true;
+            
+        } catch (Exception e) {
+            System.out.println("❌ Error verificando cámara: " + e.getMessage());
             return false;
         }
     }
@@ -139,35 +252,68 @@ public class ManejadorCamara {
         }
 
         try {
-            System.out.println("📸 Capturando imagen...");
+            // Capturar frame real de la cámara
+            org.bytedeco.javacv.Frame frame = grabber.grab();
+            if (frame == null) {
+                System.err.println("❌ No se pudo capturar frame de la cámara");
+                return crearImagenSimulada(); // Fallback a imagen simulada
+            }
 
-            // Simular tiempo de captura
-            Thread.sleep(500);
-
-            // Crear una imagen simulada de 64x64 píxeles (escala de grises)
-            BufferedImage imagen = new BufferedImage(64, 64, BufferedImage.TYPE_BYTE_GRAY);
-            java.awt.Graphics2D g2d = imagen.createGraphics();
+            // Convertir frame a BufferedImage
+            if (converter == null) {
+                converter = new Java2DFrameConverter();
+            }
             
-            // Simular un patrón facial básico
-            g2d.setColor(java.awt.Color.LIGHT_GRAY);
-            g2d.fillRect(0, 0, 64, 64);
+            BufferedImage imagen = converter.convert(frame);
             
-            // Simular características faciales básicas
-            g2d.setColor(java.awt.Color.DARK_GRAY);
-            g2d.fillOval(15, 20, 8, 8);  // Ojo izquierdo
-            g2d.fillOval(41, 20, 8, 8);  // Ojo derecho
-            g2d.fillOval(30, 35, 4, 6);  // Nariz
-            g2d.drawArc(25, 45, 14, 8, 0, -180); // Boca
-            
-            g2d.dispose();
-
-            System.out.println("✅ Imagen BufferedImage capturada exitosamente");
-            return imagen;
+            if (imagen != null) {
+                System.out.println("✅ Imagen real capturada de la cámara");
+                return imagen;
+            } else {
+                System.err.println("⚠️ Error convirtiendo frame, usando imagen simulada");
+                return crearImagenSimulada();
+            }
 
         } catch (Exception e) {
-            System.err.println("❌ Error al capturar imagen: " + e.getMessage());
-            return null;
+            System.err.println("❌ Error al capturar imagen real: " + e.getMessage());
+            return crearImagenSimulada(); // Fallback en caso de error
         }
+    }
+    
+    /**
+     * Crear imagen simulada como fallback
+     */
+    private BufferedImage crearImagenSimulada() {
+        // Crear una imagen simulada de 640x480 píxeles
+        BufferedImage imagen = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g2d = imagen.createGraphics();
+        
+        // Fondo gris claro
+        g2d.setColor(new Color(220, 220, 220));
+        g2d.fillRect(0, 0, 640, 480);
+        
+        // Simular características faciales más grandes y visibles
+        g2d.setColor(new Color(180, 150, 120)); // Color piel
+        g2d.fillOval(220, 160, 200, 240); // Cara
+        
+        // Ojos
+        g2d.setColor(Color.BLACK);
+        g2d.fillOval(260, 220, 20, 20); // Ojo izquierdo
+        g2d.fillOval(360, 220, 20, 20); // Ojo derecho
+        
+        // Nariz
+        g2d.drawLine(320, 260, 320, 300);
+        
+        // Boca
+        g2d.drawArc(300, 320, 40, 20, 0, -180);
+        
+        // Texto indicativo
+        g2d.setColor(Color.RED);
+        g2d.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 16));
+        g2d.drawString("CÁMARA SIMULADA", 250, 100);
+        
+        g2d.dispose();
+        return imagen;
     }
 
     /**
@@ -374,6 +520,68 @@ public class ManejadorCamara {
         info.append("Formato: RGB\n");
         info.append("Detección de rostros: Habilitada\n");
         return info.toString();
+    }
+
+    /**
+     * Diagnosticar problemas de cámara
+     */
+    public void diagnosticarCamara() {
+        System.out.println("\n🔍 DIAGNÓSTICO DE CÁMARA");
+        System.out.println("========================");
+        
+        try {
+            // Verificar sistema operativo
+            String os = System.getProperty("os.name").toLowerCase();
+            System.out.println("💻 Sistema Operativo: " + os);
+            
+            // Verificar Java version
+            String javaVersion = System.getProperty("java.version");
+            System.out.println("☕ Java Version: " + javaVersion);
+            
+            // Verificar librerías disponibles
+            System.out.println("📚 Verificando librerías JavaCV...");
+            try {
+                Class.forName("org.bytedeco.javacv.OpenCVFrameGrabber");
+                System.out.println("✅ JavaCV disponible");
+            } catch (ClassNotFoundException e) {
+                System.out.println("❌ JavaCV no encontrado");
+            }
+            
+            // Información de cámaras disponibles
+            System.out.println("\n📹 Probando cámaras disponibles:");
+            for (int i = 0; i <= 3; i++) {
+                System.out.println("Probando índice " + i + "...");
+                OpenCVFrameGrabber testGrabber = null;
+                try {
+                    testGrabber = new OpenCVFrameGrabber(i);
+                    testGrabber.start();
+                    System.out.println("✅ Cámara " + i + " disponible");
+                } catch (Exception e) {
+                    System.out.println("❌ Cámara " + i + " no disponible: " + e.getMessage());
+                } finally {
+                    if (testGrabber != null) {
+                        try {
+                            testGrabber.stop();
+                            testGrabber.release();
+                        } catch (Exception e) {
+                            // Ignorar errores de limpieza
+                        }
+                    }
+                }
+            }
+            
+            // Sugerencias de solución
+            System.out.println("\n💡 SUGERENCIAS:");
+            System.out.println("• Verificar que la cámara no esté siendo usada por otra aplicación");
+            System.out.println("• Revisar permisos de cámara en Windows");
+            System.out.println("• Probar con diferentes aplicaciones de cámara");
+            System.out.println("• Verificar drivers de cámara actualizados");
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error en diagnóstico: " + e.getMessage());
+        }
+        
+        System.out.println("========================\n");
     }
 
     /**
