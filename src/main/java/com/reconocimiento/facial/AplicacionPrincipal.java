@@ -33,31 +33,31 @@ public class AplicacionPrincipal {
 
             // Verificar requisitos del sistema
             if (!verificarRequisitos()) {
-                mostrarErrorYSalir("El sistema no cumple con los requisitos mínimos para ejecutar la aplicación.");
+                mostrarErrorYSalir("El sistema no cumple con los requisitos minimos para ejecutar la aplicacion.");
                 return;
             }
 
             // Inicializar sistema
             if (!inicializarSistema()) {
-                mostrarErrorYSalir("Error al inicializar el sistema. Verifique la configuración.");
+                mostrarErrorYSalir("Error al inicializar el sistema. Verifique la configuracion.");
                 return;
             }
 
             // Iniciar con el nuevo controlador principal
             SwingUtilities.invokeLater(() -> {
                 try {
-                    System.out.println("🚀 Iniciando sistema con controlador principal...");
+                    System.out.println("Iniciando sistema con controlador principal...");
                     
                     ControladorPrincipal controlador = new ControladorPrincipal();
                     controlador.iniciarAplicacion();
                     
                     // Ejecutar pruebas si se especifica
                     if (args.length > 0 && "--test".equals(args[0])) {
-                        System.out.println("\n🧪 MODO PRUEBA ACTIVADO");
+                        System.out.println("\nMODO PRUEBA ACTIVADO");
                         controlador.ejecutarPruebasSistema();
                     }
                     
-                    System.out.println("✅ Sistema de Reconocimiento Facial iniciado correctamente");
+                    System.out.println("Sistema de Reconocimiento Facial iniciado correctamente");
                     
                 } catch (Exception e) {
                     System.err.println("❌ Error al iniciar la aplicación: " + e.getMessage());
@@ -78,9 +78,9 @@ public class AplicacionPrincipal {
      */
     private static void mostrarMensajeBienvenida() {
         System.out.println("=====================================");
-        System.out.println("🎯 " + TITULO_APLICACION);
-        System.out.println("📱 Versión: " + VERSION);
-        System.out.println("🚀 Iniciando aplicación...");
+        System.out.println("* " + TITULO_APLICACION);
+        System.out.println("* Version: " + VERSION);
+        System.out.println("* Iniciando aplicacion...");
         System.out.println("=====================================");
         System.out.println();
     }
@@ -152,7 +152,7 @@ public class AplicacionPrincipal {
 
         // Verificar versión de Java
         String versionJava = System.getProperty("java.version");
-        System.out.println("Versión de Java: " + versionJava);
+        System.out.println("Version de Java: " + versionJava);
 
         // Verificar que sea Java 8 o superior
         try {
@@ -170,7 +170,7 @@ public class AplicacionPrincipal {
         // Verificar memoria disponible
         Runtime runtime = Runtime.getRuntime();
         long memoriaMaxima = runtime.maxMemory() / (1024 * 1024); // En MB
-        System.out.println("Memoria máxima disponible: " + memoriaMaxima + " MB");
+        System.out.println("Memoria maxima disponible: " + memoriaMaxima + " MB");
 
         if (memoriaMaxima < 512) {
             System.err.println("Se requieren al menos 512 MB de memoria");
@@ -181,7 +181,7 @@ public class AplicacionPrincipal {
         String sistemaOperativo = System.getProperty("os.name");
         System.out.println("Sistema operativo: " + sistemaOperativo);
 
-        System.out.println("Todos los requisitos del sistema están satisfechos");
+        System.out.println("Todos los requisitos del sistema estan satisfechos");
         return true;
     }
 
@@ -217,7 +217,7 @@ public class AplicacionPrincipal {
             boolean conexionExitosa = conexion.probarConexion();
 
             if (conexionExitosa) {
-                System.out.println("Conexión a base de datos establecida correctamente");
+                System.out.println("Conexion a base de datos establecida correctamente");
                 conexion.mostrarEstadisticasPool();
             } else {
                 System.err.println("Fallo en la conexión a la base de datos");
@@ -256,14 +256,14 @@ public class AplicacionPrincipal {
         try {
             // Nota: Esta verificación se podría hacer más robusta
             // con la implementación real de ManejadorCamara
-            System.out.println("Verificando disponibilidad de cámara...");
+            System.out.println("Verificando disponibilidad de camara...");
 
             // Por ahora, asumir que hay al menos una cámara disponible
             // En una implementación real, aquí se verificaría con JavaCV
-            System.out.println("Cámara disponible para captura");
+            System.out.println("Camara disponible para captura");
 
         } catch (Exception e) {
-            System.err.println("No se pudo verificar la disponibilidad de cámara: " + e.getMessage());
+            System.err.println("No se pudo verificar la disponibilidad de camara: " + e.getMessage());
             // No es un error crítico, la aplicación puede continuar
         }
     }
@@ -291,7 +291,7 @@ public class AplicacionPrincipal {
      * Método para cerrar la aplicación de forma ordenada
      */
     public static void cerrarAplicacion() {
-        System.out.println("Cerrando aplicación...");
+        System.out.println("Cerrando aplicacion...");
 
         try {
             // Cerrar conexiones de base de datos
@@ -306,7 +306,7 @@ public class AplicacionPrincipal {
             System.err.println("Error durante el cierre: " + e.getMessage());
         }
 
-        System.out.println("Aplicación cerrada correctamente");
+        System.out.println("Aplicacion cerrada correctamente");
         System.exit(0);
     }
 

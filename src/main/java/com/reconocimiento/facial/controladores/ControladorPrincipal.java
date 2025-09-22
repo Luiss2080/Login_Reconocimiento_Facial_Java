@@ -3,6 +3,7 @@ package com.reconocimiento.facial.controladores;
 import com.reconocimiento.facial.configuracion.ConfiguracionSistema;
 import com.reconocimiento.facial.servicios.ServicioUsuarioMejorado;
 import com.reconocimiento.facial.modelos.Usuario;
+import com.reconocimiento.facial.formularios.FormularioLoginNuevo;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -39,16 +40,16 @@ public class ControladorPrincipal {
             
             this.sistemaInicializado = true;
             
-            System.out.println("✅ Sistema inicializado correctamente");
+            System.out.println("Sistema inicializado correctamente");
             mostrarInformacionSistema();
             
         } catch (Exception e) {
-            System.err.println("❌ Error crítico inicializando sistema: " + e.getMessage());
+            System.err.println("Error critico inicializando sistema: " + e.getMessage());
             e.printStackTrace();
             
             // Mostrar error al usuario
             JOptionPane.showMessageDialog(null, 
-                "Error crítico iniciando el sistema:\n" + e.getMessage(),
+                "Error critico iniciando el sistema:\n" + e.getMessage(),
                 "Error del Sistema", 
                 JOptionPane.ERROR_MESSAGE);
             
@@ -69,10 +70,17 @@ public class ControladorPrincipal {
             // Configurar Look and Feel
             configurarLookAndFeel();
             
-            System.out.println("✅ Aplicación lista para usar");
+            // Mostrar formulario de login automáticamente
+            System.out.println("🚀 Mostrando formulario de login...");
+            SwingUtilities.invokeLater(() -> {
+                FormularioLoginNuevo formularioLogin = new FormularioLoginNuevo();
+                formularioLogin.setVisible(true);
+            });
+            
+            System.out.println("Aplicacion lista para usar");
             
         } catch (Exception e) {
-            System.err.println("❌ Error iniciando aplicación: " + e.getMessage());
+            System.err.println("Error iniciando aplicacion: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -91,7 +99,7 @@ public class ControladorPrincipal {
             }
             
             // Configuraciones adicionales de UI
-            UIManager.put("OptionPane.yesButtonText", "Sí");
+            UIManager.put("OptionPane.yesButtonText", "Si");
             UIManager.put("OptionPane.noButtonText", "No");
             UIManager.put("OptionPane.cancelButtonText", "Cancelar");
             
@@ -107,23 +115,23 @@ public class ControladorPrincipal {
      */
     public boolean autenticarUsuario(String nombreUsuario, String contrasena) {
         try {
-            System.out.println("🔐 Procesando autenticación por credenciales...");
+            System.out.println("Procesando autenticacion por credenciales...");
             
             Optional<Usuario> usuarioOpt = servicioUsuario.autenticarUsuario(nombreUsuario, contrasena);
             
             if (usuarioOpt.isPresent()) {
                 Usuario usuario = usuarioOpt.get();
                 this.usuarioActual = usuario;
-                System.out.println("✅ Autenticación exitosa: " + usuario.getNombreUsuario());
+                System.out.println("Autenticacion exitosa: " + usuario.getNombreUsuario());
                 return true;
                 
             } else {
-                System.out.println("❌ Autenticación fallida");
+                System.out.println("Autenticacion fallida");
                 return false;
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Error en autenticación: " + e.getMessage());
+            System.err.println("Error en autenticacion: " + e.getMessage());
             return false;
         }
     }
@@ -133,7 +141,7 @@ public class ControladorPrincipal {
      */
     public boolean autenticarConReconocimientoFacial(BufferedImage imagenRostro) {
         try {
-            System.out.println("📷 Procesando autenticación facial...");
+            System.out.println("Procesando autenticacion facial...");
             
             if (imagenRostro == null) {
                 System.err.println("❌ Imagen de rostro es null");
@@ -164,15 +172,15 @@ public class ControladorPrincipal {
      */
     public void cerrarSesion() {
         try {
-            System.out.println("🚪 Cerrando sesión...");
+            System.out.println("Cerrando sesion...");
             
             if (usuarioActual != null) {
-                System.out.println("🚪 Sesión cerrada para: " + usuarioActual.getNombreUsuario());
+                System.out.println("Sesion cerrada para: " + usuarioActual.getNombreUsuario());
                 usuarioActual = null;
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Error cerrando sesión: " + e.getMessage());
+            System.err.println("Error cerrando sesion: " + e.getMessage());
         }
     }
     
@@ -200,7 +208,7 @@ public class ControladorPrincipal {
             System.out.println(servicioUsuario.obtenerEstadisticas());
             
         } catch (Exception e) {
-            System.err.println("⚠️ Error mostrando información del sistema: " + e.getMessage());
+            System.err.println("Error mostrando informacion del sistema: " + e.getMessage());
         }
     }
     

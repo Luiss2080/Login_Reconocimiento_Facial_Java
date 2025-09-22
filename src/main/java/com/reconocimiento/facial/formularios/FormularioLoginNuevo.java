@@ -51,12 +51,19 @@ public class FormularioLoginNuevo extends JFrame {
     private BufferedImage imagenCapturada;
     private boolean camaraActiva = false;
 
-    // ========== CONSTANTES DE DISEÑO ==========
-    private static final Color COLOR_PRIMARIO = new Color(33, 150, 243);
-    private static final Color COLOR_SECUNDARIO = new Color(76, 175, 80);
-    private static final Color COLOR_PELIGRO = new Color(244, 67, 54);
-    private static final Color COLOR_FONDO = new Color(245, 245, 245);
+    // ========== CONSTANTES DE DISEÑO PROFESIONAL ==========
+    private static final Color COLOR_PRINCIPAL = new Color(52, 73, 94);      // Azul oscuro profesional
+    private static final Color COLOR_ACENTO = new Color(41, 128, 185);       // Azul claro
+    private static final Color COLOR_EXITO = new Color(39, 174, 96);         // Verde
+    private static final Color COLOR_FONDO = new Color(248, 249, 250);       // Gris muy claro
     private static final Color COLOR_BLANCO = Color.WHITE;
+    private static final Color COLOR_TEXTO = new Color(44, 62, 80);          // Texto oscuro
+    private static final Color COLOR_BORDE = new Color(189, 195, 199);       // Borde gris
+    
+    private static final Font FONT_TITULO = new Font("Segoe UI", Font.BOLD, 28);
+    private static final Font FONT_SUBTITULO = new Font("Segoe UI", Font.PLAIN, 14);
+    private static final Font FONT_LABEL = new Font("Segoe UI", Font.PLAIN, 12);
+    private static final Font FONT_BOTON = new Font("Segoe UI", Font.BOLD, 13);
 
     /**
      * Constructor principal - Inicializa toda la interfaz y servicios
@@ -86,18 +93,18 @@ public class FormularioLoginNuevo extends JFrame {
     }
 
     /**
-     * 🎨 Configurar apariencia moderna
+     * Configurar apariencia moderna y profesional
      */
     private void configurarApariencia() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.err.println("⚠️ No se pudo configurar apariencia: " + e.getMessage());
+            System.err.println("No se pudo configurar apariencia: " + e.getMessage());
         }
     }
 
     /**
-     * 🔧 Inicializar todos los servicios necesarios
+     * Inicializar todos los servicios necesarios
      */
     private void inicializarServicios() {
         try {
@@ -105,178 +112,225 @@ public class FormularioLoginNuevo extends JFrame {
             this.redNeuronal = new RedNeuronalReconocimiento();
             this.manejadorCamara = new ManejadorCamara();
             
-            System.out.println("✅ Servicios inicializados correctamente");
+            System.out.println("Servicios inicializados correctamente");
         } catch (Exception e) {
             throw new RuntimeException("Error inicializando servicios: " + e.getMessage(), e);
         }
     }
 
     /**
-     * 🏗️ Inicializar todos los componentes de la interfaz
+     * Inicializar todos los componentes de la interfaz con diseño profesional
      */
     private void inicializarComponentes() {
-        // Panel principal
+        // Panel principal con diseño moderno
         panelPrincipal = new JPanel();
         panelPrincipal.setBackground(COLOR_FONDO);
         
-        // Panel de título
+        // Panel de título con estilo corporativo
         panelTitulo = new JPanel();
-        panelTitulo.setBackground(COLOR_PRIMARIO);
+        panelTitulo.setBackground(COLOR_PRINCIPAL);
+        panelTitulo.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
         
-        lblTitulo = new JLabel("🛡️ SISTEMA DE AUTENTICACIÓN");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTitulo = new JLabel("SISTEMA DE AUTENTICACION");
+        lblTitulo.setFont(FONT_TITULO);
         lblTitulo.setForeground(COLOR_BLANCO);
         lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
         
-        lblSubtitulo = new JLabel("Reconocimiento Facial • Credenciales Tradicionales");
-        lblSubtitulo.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-        lblSubtitulo.setForeground(COLOR_BLANCO);
+        lblSubtitulo = new JLabel("Acceso Seguro | Reconocimiento Facial y Credenciales");
+        lblSubtitulo.setFont(FONT_SUBTITULO);
+        lblSubtitulo.setForeground(new Color(236, 240, 241));
         lblSubtitulo.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Panel de opciones principales
+        // Panel de opciones principales con espaciado profesional
         panelOpciones = new JPanel();
         panelOpciones.setBackground(COLOR_FONDO);
+        panelOpciones.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         
-        // Panel de credenciales
+        // Panel de credenciales renovado
         crearPanelCredenciales();
         
-        // Panel facial
+        // Panel facial renovado
         crearPanelFacial();
         
-        // Panel de botones
+        // Panel de botones renovado
         crearPanelBotones();
         
-        // Estado
-        lblEstado = new JLabel("✨ Seleccione su método de autenticación preferido");
-        lblEstado.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        // Estado con diseño limpio
+        lblEstado = new JLabel("Seleccione su metodo de autenticacion preferido");
+        lblEstado.setFont(FONT_SUBTITULO);
         lblEstado.setHorizontalAlignment(SwingConstants.CENTER);
-        lblEstado.setForeground(COLOR_PRIMARIO);
+        lblEstado.setForeground(COLOR_TEXTO);
+        lblEstado.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
     }
 
     /**
-     * 🔐 Crear panel de autenticación por credenciales
+     * Crear panel de autenticación por credenciales con diseño profesional
      */
     private void crearPanelCredenciales() {
         panelCredenciales = new JPanel();
         panelCredenciales.setBackground(COLOR_BLANCO);
         panelCredenciales.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_PRIMARIO, 2),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            BorderFactory.createLineBorder(COLOR_BORDE, 1),
+            BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
         
-        JLabel lblTituloCredenciales = new JLabel("🔐 Acceso con Credenciales");
-        lblTituloCredenciales.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblTituloCredenciales.setForeground(COLOR_PRIMARIO);
+        JLabel lblTituloCredenciales = new JLabel("Acceso con Credenciales");
+        lblTituloCredenciales.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTituloCredenciales.setForeground(COLOR_PRINCIPAL);
+        lblTituloCredenciales.setHorizontalAlignment(SwingConstants.CENTER);
         
-        JLabel lblUsuario = new JLabel("👤 Usuario:");
-        lblUsuario.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setFont(FONT_LABEL);
+        lblUsuario.setForeground(COLOR_TEXTO);
         
         txtUsuario = new JTextField();
         txtUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        txtUsuario.setPreferredSize(new Dimension(250, 35));
+        txtUsuario.setPreferredSize(new Dimension(280, 35));
+        txtUsuario.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_BORDE, 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
         
-        JLabel lblContrasena = new JLabel("🔑 Contraseña:");
-        lblContrasena.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JLabel lblContrasena = new JLabel("Contraseña:");
+        lblContrasena.setFont(FONT_LABEL);
+        lblContrasena.setForeground(COLOR_TEXTO);
         
         txtContrasena = new JPasswordField();
         txtContrasena.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        txtContrasena.setPreferredSize(new Dimension(250, 35));
+        txtContrasena.setPreferredSize(new Dimension(280, 35));
+        txtContrasena.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_BORDE, 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
         
-        btnLoginCredenciales = new JButton("🚀 INGRESAR");
-        btnLoginCredenciales.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnLoginCredenciales.setBackground(COLOR_PRIMARIO);
-        btnLoginCredenciales.setForeground(COLOR_BLANCO);
-        btnLoginCredenciales.setPreferredSize(new Dimension(250, 40));
+        btnLoginCredenciales = new JButton("INGRESAR");
+        btnLoginCredenciales.setFont(FONT_BOTON);
+        btnLoginCredenciales.setBackground(COLOR_PRINCIPAL);
+        btnLoginCredenciales.setForeground(Color.BLACK);
+        btnLoginCredenciales.setPreferredSize(new Dimension(280, 42));
         btnLoginCredenciales.setFocusPainted(false);
+        btnLoginCredenciales.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnLoginCredenciales.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Layout del panel credenciales
+        // Layout del panel credenciales con mejor espaciado
         panelCredenciales.setLayout(new BoxLayout(panelCredenciales, BoxLayout.Y_AXIS));
         panelCredenciales.add(lblTituloCredenciales);
-        panelCredenciales.add(Box.createVerticalStrut(15));
+        panelCredenciales.add(Box.createVerticalStrut(25));
         panelCredenciales.add(lblUsuario);
-        panelCredenciales.add(Box.createVerticalStrut(5));
+        panelCredenciales.add(Box.createVerticalStrut(8));
         panelCredenciales.add(txtUsuario);
-        panelCredenciales.add(Box.createVerticalStrut(10));
+        panelCredenciales.add(Box.createVerticalStrut(15));
         panelCredenciales.add(lblContrasena);
-        panelCredenciales.add(Box.createVerticalStrut(5));
+        panelCredenciales.add(Box.createVerticalStrut(8));
         panelCredenciales.add(txtContrasena);
-        panelCredenciales.add(Box.createVerticalStrut(20));
+        panelCredenciales.add(Box.createVerticalStrut(25));
         panelCredenciales.add(btnLoginCredenciales);
+        
+        // Centrar todos los componentes
+        lblTituloCredenciales.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblUsuario.setAlignmentX(Component.CENTER_ALIGNMENT);
+        txtUsuario.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblContrasena.setAlignmentX(Component.CENTER_ALIGNMENT);
+        txtContrasena.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnLoginCredenciales.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
     /**
-     * 📷 Crear panel de reconocimiento facial
+     * Crear panel de reconocimiento facial con diseño profesional
      */
     private void crearPanelFacial() {
         panelFacial = new JPanel();
         panelFacial.setBackground(COLOR_BLANCO);
         panelFacial.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_SECUNDARIO, 2),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            BorderFactory.createLineBorder(COLOR_BORDE, 1),
+            BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
         
-        JLabel lblTituloFacial = new JLabel("📷 Reconocimiento Facial");
-        lblTituloFacial.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblTituloFacial.setForeground(COLOR_SECUNDARIO);
+        JLabel lblTituloFacial = new JLabel("Reconocimiento Facial");
+        lblTituloFacial.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTituloFacial.setForeground(COLOR_ACENTO);
+        lblTituloFacial.setHorizontalAlignment(SwingConstants.CENTER);
         
-        lblCamara = new JLabel("📸");
-        lblCamara.setFont(new Font("Segoe UI", Font.PLAIN, 48));
+        lblCamara = new JLabel("CAMARA DESACTIVADA");
+        lblCamara.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblCamara.setHorizontalAlignment(SwingConstants.CENTER);
-        lblCamara.setPreferredSize(new Dimension(200, 150));
-        lblCamara.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        lblCamara.setVerticalAlignment(SwingConstants.CENTER);
+        lblCamara.setPreferredSize(new Dimension(280, 180));
+        lblCamara.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_BORDE, 2),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
         lblCamara.setOpaque(true);
         lblCamara.setBackground(new Color(240, 240, 240));
+        lblCamara.setForeground(new Color(120, 120, 120));
         
-        btnActivarCamara = new JButton("📹 ACTIVAR CÁMARA");
-        btnActivarCamara.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnActivarCamara.setBackground(COLOR_SECUNDARIO);
-        btnActivarCamara.setForeground(COLOR_BLANCO);
-        btnActivarCamara.setPreferredSize(new Dimension(200, 35));
+        btnActivarCamara = new JButton("ACTIVAR CAMARA");
+        btnActivarCamara.setFont(FONT_BOTON);
+        btnActivarCamara.setBackground(COLOR_ACENTO);
+        btnActivarCamara.setForeground(Color.BLACK);
+        btnActivarCamara.setPreferredSize(new Dimension(280, 40));
         btnActivarCamara.setFocusPainted(false);
+        btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnActivarCamara.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        btnLoginFacial = new JButton("🧠 RECONOCER ROSTRO");
-        btnLoginFacial.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnLoginFacial.setBackground(COLOR_SECUNDARIO);
-        btnLoginFacial.setForeground(COLOR_BLANCO);
-        btnLoginFacial.setPreferredSize(new Dimension(200, 40));
+        btnLoginFacial = new JButton("RECONOCER ROSTRO");
+        btnLoginFacial.setFont(FONT_BOTON);
+        btnLoginFacial.setBackground(COLOR_EXITO);
+        btnLoginFacial.setForeground(Color.BLACK);
+        btnLoginFacial.setPreferredSize(new Dimension(280, 42));
         btnLoginFacial.setFocusPainted(false);
         btnLoginFacial.setEnabled(false);
+        btnLoginFacial.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnLoginFacial.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Layout del panel facial
+        // Layout del panel facial con mejor espaciado
         panelFacial.setLayout(new BoxLayout(panelFacial, BoxLayout.Y_AXIS));
         panelFacial.add(lblTituloFacial);
-        panelFacial.add(Box.createVerticalStrut(15));
+        panelFacial.add(Box.createVerticalStrut(20));
         panelFacial.add(lblCamara);
-        panelFacial.add(Box.createVerticalStrut(10));
+        panelFacial.add(Box.createVerticalStrut(15));
         panelFacial.add(btnActivarCamara);
         panelFacial.add(Box.createVerticalStrut(10));
         panelFacial.add(btnLoginFacial);
+        
+        // Centrar todos los componentes
+        lblTituloFacial.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnActivarCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnLoginFacial.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
     /**
-     * 🎛️ Crear panel de botones adicionales
+     * Crear panel de botones adicionales con diseño profesional
      */
     private void crearPanelBotones() {
-        panelBotones = new JPanel(new FlowLayout());
+        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         panelBotones.setBackground(COLOR_FONDO);
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
         
-        btnRegistrarse = new JButton("👥 Registrarse");
-        btnRegistrarse.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnRegistrarse.setBackground(new Color(255, 193, 7));
+        btnRegistrarse = new JButton("Registrarse");
+        btnRegistrarse.setFont(FONT_BOTON);
+        btnRegistrarse.setBackground(new Color(230, 126, 34)); // Naranja profesional
         btnRegistrarse.setForeground(Color.BLACK);
         btnRegistrarse.setFocusPainted(false);
+        btnRegistrarse.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnRegistrarse.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        btnAyuda = new JButton("❓ Ayuda");
-        btnAyuda.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnAyuda.setBackground(new Color(108, 117, 125));
-        btnAyuda.setForeground(COLOR_BLANCO);
+        btnAyuda = new JButton("Ayuda");
+        btnAyuda.setFont(FONT_BOTON);
+        btnAyuda.setBackground(new Color(149, 165, 166)); // Gris profesional
+        btnAyuda.setForeground(Color.BLACK);
         btnAyuda.setFocusPainted(false);
+        btnAyuda.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnAyuda.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        btnSalir = new JButton("🚪 Salir");
-        btnSalir.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnSalir.setBackground(COLOR_PELIGRO);
-        btnSalir.setForeground(COLOR_BLANCO);
+        btnSalir = new JButton("Salir");
+        btnSalir.setFont(FONT_BOTON);
+        btnSalir.setBackground(new Color(231, 76, 60)); // Rojo profesional
+        btnSalir.setForeground(Color.BLACK);
         btnSalir.setFocusPainted(false);
+        btnSalir.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnSalir.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         panelBotones.add(btnRegistrarse);
         panelBotones.add(btnAyuda);
@@ -284,31 +338,37 @@ public class FormularioLoginNuevo extends JFrame {
     }
 
     /**
-     * 📐 Configurar el layout de la ventana
+     * Configurar el layout de la ventana con diseño profesional
      */
     private void configurarLayout() {
         setLayout(new BorderLayout());
         
-        // Panel título
+        // Panel título con mejor spacing
         panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
         panelTitulo.add(Box.createVerticalStrut(20));
         panelTitulo.add(lblTitulo);
-        panelTitulo.add(Box.createVerticalStrut(5));
+        panelTitulo.add(Box.createVerticalStrut(8));
         panelTitulo.add(lblSubtitulo);
         panelTitulo.add(Box.createVerticalStrut(20));
         
-        // Panel opciones
-        panelOpciones.setLayout(new GridLayout(1, 2, 20, 0));
-        panelOpciones.setBorder(BorderFactory.createEmptyBorder(30, 30, 20, 30));
+        // Panel opciones con espacio adecuado
+        panelOpciones.setLayout(new GridLayout(1, 2, 30, 0));
+        panelOpciones.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         panelOpciones.add(panelCredenciales);
         panelOpciones.add(panelFacial);
         
-        // Panel principal
+        // Panel central que contiene opciones y estado
+        JPanel panelCentro = new JPanel(new BorderLayout());
+        panelCentro.setBackground(COLOR_FONDO);
+        panelCentro.add(panelOpciones, BorderLayout.CENTER);
+        panelCentro.add(lblEstado, BorderLayout.SOUTH);
+        
+        // Panel principal con mejor organización
         panelPrincipal.setLayout(new BorderLayout());
         panelPrincipal.add(panelTitulo, BorderLayout.NORTH);
-        panelPrincipal.add(panelOpciones, BorderLayout.CENTER);
-        panelPrincipal.add(lblEstado, BorderLayout.SOUTH);
+        panelPrincipal.add(panelCentro, BorderLayout.CENTER);
         
+        // Estructura final de la ventana
         add(panelPrincipal, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
     }
@@ -371,20 +431,20 @@ public class FormularioLoginNuevo extends JFrame {
     }
 
     /**
-     * 🪟 Configurar propiedades de la ventana
+     * Configurar propiedades de la ventana con diseño profesional
      */
     private void configurarVentana() {
-        setTitle("Sistema de Autenticación - Reconocimiento Facial");
+        setTitle("Sistema de Autenticacion Empresarial");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(950, 700);
         setLocationRelativeTo(null);
         setResizable(false);
         
-        // Icono de la aplicación
+        // Configurar icono de la aplicación
         try {
             // setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
         } catch (Exception e) {
-            System.err.println("No se pudo cargar el icono de la aplicación");
+            System.err.println("No se pudo cargar el icono de la aplicacion");
         }
     }
 
@@ -392,16 +452,16 @@ public class FormularioLoginNuevo extends JFrame {
      * 💬 Mostrar mensaje de bienvenida
      */
     private void mostrarMensajeBienvenida() {
-        actualizarEstado("🎉 Sistema iniciado correctamente. ¡Bienvenido!");
+        actualizarEstado("Sistema iniciado correctamente. Bienvenido!");
         
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this,
-                "🚀 Bienvenido al Sistema de Autenticación\n\n" +
+                "Bienvenido al Sistema de Autenticacion\n\n" +
                 "Opciones disponibles:\n" +
-                "• 🔐 Login con usuario y contraseña\n" +
-                "• 📷 Reconocimiento facial avanzado\n" +
-                "• 👥 Registro de nuevos usuarios\n\n" +
-                "Seleccione su método preferido para continuar.",
+                "• Login con usuario y contraseña\n" +
+                "• Reconocimiento facial avanzado\n" +
+                "• Registro de nuevos usuarios\n\n" +
+                "Seleccione su metodo preferido para continuar.",
                 "Bienvenido", JOptionPane.INFORMATION_MESSAGE);
         });
     }
@@ -418,7 +478,7 @@ public class FormularioLoginNuevo extends JFrame {
             return;
         }
         
-        actualizarEstado("🔍 Verificando credenciales...");
+        actualizarEstado("Verificando credenciales...");
         
         // Ejecutar autenticación en hilo separado
         SwingWorker<Optional<Usuario>, Void> worker = new SwingWorker<Optional<Usuario>, Void>() {
@@ -432,10 +492,10 @@ public class FormularioLoginNuevo extends JFrame {
                 try {
                     Optional<Usuario> usuarioAutenticado = get();
                     if (usuarioAutenticado.isPresent()) {
-                        mostrarExito("✅ Autenticación exitosa");
+                        mostrarExito("Autenticacion exitosa");
                         abrirVentanaPrincipal(usuarioAutenticado.get(), "CREDENCIALES");
                     } else {
-                        mostrarError("❌ Credenciales incorrectas");
+                        mostrarError("Credenciales incorrectas");
                         limpiarCampos();
                     }
                 } catch (Exception e) {
@@ -452,7 +512,7 @@ public class FormularioLoginNuevo extends JFrame {
      */
     private void activarCamara() {
         if (!camaraActiva) {
-            actualizarEstado("📹 Activando cámara...");
+            actualizarEstado("Activando camara...");
             
             SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                 @Override
@@ -466,14 +526,16 @@ public class FormularioLoginNuevo extends JFrame {
                         boolean exito = get();
                         if (exito) {
                             camaraActiva = true;
-                            btnActivarCamara.setText("📹 CÁMARA ACTIVA");
+                            btnActivarCamara.setText("CAMARA ACTIVA");
+                            btnActivarCamara.setBackground(new Color(40, 167, 69)); // Verde
                             btnActivarCamara.setEnabled(false);
                             btnLoginFacial.setEnabled(true);
-                            lblCamara.setText("📹");
-                            lblCamara.setBackground(COLOR_SECUNDARIO);
-                            actualizarEstado("✅ Cámara activa - Listo para reconocimiento");
+                            lblCamara.setText("CAMARA CONECTADA");
+                            lblCamara.setBackground(new Color(40, 167, 69));
+                            lblCamara.setForeground(Color.WHITE);
+                            actualizarEstado("Camara activa - Listo para reconocimiento");
                         } else {
-                            mostrarError("❌ No se pudo activar la cámara");
+                            mostrarError("No se pudo activar la camara");
                         }
                     } catch (Exception e) {
                         mostrarError("Error activando cámara: " + e.getMessage());
@@ -494,7 +556,7 @@ public class FormularioLoginNuevo extends JFrame {
             return;
         }
         
-        actualizarEstado("🧠 Analizando rostro...");
+        actualizarEstado("Analizando rostro...");
         
         SwingWorker<Optional<Usuario>, Void> worker = new SwingWorker<Optional<Usuario>, Void>() {
             @Override
@@ -514,11 +576,11 @@ public class FormularioLoginNuevo extends JFrame {
                 try {
                     Optional<Usuario> usuarioReconocido = get();
                     if (usuarioReconocido.isPresent()) {
-                        mostrarExito("✅ Reconocimiento facial exitoso");
+                        mostrarExito("Reconocimiento facial exitoso");
                         abrirVentanaPrincipal(usuarioReconocido.get(), "RECONOCIMIENTO_FACIAL");
                     } else {
-                        mostrarError("❌ Rostro no reconocido");
-                        actualizarEstado("🔍 Intente nuevamente o use credenciales");
+                        mostrarError("Rostro no reconocido");
+                        actualizarEstado("Intente nuevamente o use credenciales");
                     }
                 } catch (Exception e) {
                     mostrarError("Error en reconocimiento: " + e.getMessage());
@@ -612,19 +674,19 @@ public class FormularioLoginNuevo extends JFrame {
     }
 
     /**
-     * ✅ Mostrar mensaje de éxito
+     * Mostrar mensaje de éxito
      */
     private void mostrarExito(String mensaje) {
         actualizarEstado(mensaje);
-        lblEstado.setForeground(COLOR_SECUNDARIO);
+        lblEstado.setForeground(COLOR_EXITO);
     }
 
     /**
-     * ❌ Mostrar mensaje de error
+     * Mostrar mensaje de error
      */
     private void mostrarError(String mensaje) {
         actualizarEstado(mensaje);
-        lblEstado.setForeground(COLOR_PELIGRO);
+        lblEstado.setForeground(new Color(231, 76, 60)); // Rojo de error
         
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);

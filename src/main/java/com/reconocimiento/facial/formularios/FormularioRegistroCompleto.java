@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * 👥 FORMULARIO DE REGISTRO DE USUARIOS
- * Sistema completo con captura biométrica y validaciones robustas
- * Incluye entrenamiento automático de la red neuronal
+ * FORMULARIO DE REGISTRO DE USUARIOS
+ * Sistema completo con captura biometrica y validaciones robustas
+ * Incluye entrenamiento automatico de la red neuronal
  */
 public class FormularioRegistroCompleto extends JFrame {
 
@@ -46,7 +46,7 @@ public class FormularioRegistroCompleto extends JFrame {
     private JButton btnCancelar;
     private JButton btnVolverLogin;
 
-    // ========== SERVICIOS Y LÓGICA ==========
+    // ========== SERVICIOS Y LOGICA ==========
     private ServicioUsuarioMejorado servicioUsuario;
     private ManejadorCamara manejadorCamara;
     
@@ -56,12 +56,24 @@ public class FormularioRegistroCompleto extends JFrame {
     private boolean camaraActiva = false;
     private boolean capturaEnProceso = false;
 
-    // ========== CONSTANTES DE DISEÑO ==========
-    private static final Color COLOR_PRIMARIO = new Color(33, 150, 243);
-    private static final Color COLOR_SECUNDARIO = new Color(76, 175, 80);
-    private static final Color COLOR_PELIGRO = new Color(244, 67, 54);
-    private static final Color COLOR_FONDO = new Color(245, 245, 245);
+    // ========== CONSTANTES DE DISEÑO PROFESIONAL ==========
+    private static final Color COLOR_PRINCIPAL = new Color(52, 73, 94);      // Azul oscuro profesional
+    private static final Color COLOR_ACENTO = new Color(41, 128, 185);       // Azul claro
+    private static final Color COLOR_EXITO = new Color(39, 174, 96);         // Verde
+    private static final Color COLOR_FONDO = new Color(248, 249, 250);       // Gris muy claro
     private static final Color COLOR_BLANCO = Color.WHITE;
+    private static final Color COLOR_TEXTO = new Color(44, 62, 80);          // Texto oscuro
+    private static final Color COLOR_BORDE = new Color(189, 195, 199);       // Borde gris
+    
+    // Constantes de compatibilidad
+    private static final Color COLOR_PRIMARIO = COLOR_PRINCIPAL;
+    private static final Color COLOR_SECUNDARIO = COLOR_ACENTO;
+    private static final Color COLOR_PELIGRO = new Color(231, 76, 60);      // Rojo error
+    
+    private static final Font FONT_TITULO = new Font("Segoe UI", Font.BOLD, 28);
+    private static final Font FONT_SUBTITULO = new Font("Segoe UI", Font.PLAIN, 14);
+    private static final Font FONT_LABEL = new Font("Segoe UI", Font.PLAIN, 12);
+    private static final Font FONT_BOTON = new Font("Segoe UI", Font.BOLD, 13);
 
     /**
      * Constructor principal
@@ -91,13 +103,13 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 🎨 Configurar apariencia
+     * Configurar apariencia profesional
      */
     private void configurarApariencia() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.err.println("⚠️ No se pudo configurar apariencia: " + e.getMessage());
+            System.err.println("No se pudo configurar apariencia: " + e.getMessage());
         }
     }
 
@@ -110,14 +122,14 @@ public class FormularioRegistroCompleto extends JFrame {
             this.manejadorCamara = new ManejadorCamara();
             this.muestrasFaciales = new ArrayList<>();
             
-            System.out.println("✅ Servicios de registro inicializados");
+            System.out.println("Servicios de registro inicializados");
         } catch (Exception e) {
             throw new RuntimeException("Error inicializando servicios: " + e.getMessage(), e);
         }
     }
 
     /**
-     * 🏗️ Inicializar componentes
+     * Inicializar componentes
      */
     private void inicializarComponentes() {
         // Panel principal
@@ -137,7 +149,7 @@ public class FormularioRegistroCompleto extends JFrame {
         crearPanelBotones();
         
         // Estado
-        lblEstado = new JLabel("✨ Complete el formulario y capture sus imágenes faciales");
+        lblEstado = new JLabel("Complete el formulario y capture sus imágenes faciales");
         lblEstado.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblEstado.setHorizontalAlignment(SwingConstants.CENTER);
         lblEstado.setForeground(COLOR_PRIMARIO);
@@ -147,29 +159,34 @@ public class FormularioRegistroCompleto extends JFrame {
      * 📋 Crear panel de título
      */
     private void crearPanelTitulo() {
-        panelTitulo = new JPanel();
+        panelTitulo = new JPanel(new BorderLayout());
         panelTitulo.setBackground(COLOR_PRIMARIO);
+        panelTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         
-        JLabel lblTitulo = new JLabel("👥 REGISTRO DE NUEVO USUARIO");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        JLabel lblTitulo = new JLabel("REGISTRO DE NUEVO USUARIO");
+        lblTitulo.setFont(FONT_TITULO);
         lblTitulo.setForeground(COLOR_BLANCO);
         lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
         
         JLabel lblSubtitulo = new JLabel("Complete sus datos y capture imágenes para el reconocimiento facial");
-        lblSubtitulo.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        lblSubtitulo.setFont(FONT_SUBTITULO);
         lblSubtitulo.setForeground(COLOR_BLANCO);
         lblSubtitulo.setHorizontalAlignment(SwingConstants.CENTER);
         
-        panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
-        panelTitulo.add(Box.createVerticalStrut(20));
-        panelTitulo.add(lblTitulo);
-        panelTitulo.add(Box.createVerticalStrut(5));
-        panelTitulo.add(lblSubtitulo);
-        panelTitulo.add(Box.createVerticalStrut(20));
+        JPanel contenedorCentral = new JPanel();
+        contenedorCentral.setBackground(COLOR_PRIMARIO);
+        contenedorCentral.setLayout(new BoxLayout(contenedorCentral, BoxLayout.Y_AXIS));
+        contenedorCentral.add(Box.createVerticalStrut(10));
+        contenedorCentral.add(lblTitulo);
+        contenedorCentral.add(Box.createVerticalStrut(5));
+        contenedorCentral.add(lblSubtitulo);
+        contenedorCentral.add(Box.createVerticalStrut(10));
+        
+        panelTitulo.add(contenedorCentral, BorderLayout.CENTER);
     }
 
     /**
-     * 📝 Crear panel de formulario
+     * Crear panel de formulario
      */
     private void crearPanelFormulario() {
         panelFormulario = new JPanel();
@@ -252,90 +269,131 @@ public class FormularioRegistroCompleto extends JFrame {
      * 📷 Crear panel de captura facial
      */
     private void crearPanelCaptura() {
-        panelCaptura = new JPanel();
-        panelCaptura.setBackground(COLOR_BLANCO);
+        panelCaptura = new JPanel(new BorderLayout());
+        panelCaptura.setBackground(COLOR_FONDO);
         panelCaptura.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_SECUNDARIO, 2),
+            BorderFactory.createLineBorder(COLOR_BORDE, 1),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
         
-        JLabel lblTituloCaptura = new JLabel("📷 Captura Biométrica");
-        lblTituloCaptura.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblTituloCaptura.setForeground(COLOR_SECUNDARIO);
+        // Título de la sección
+        JLabel lblTituloCaptura = new JLabel("Captura Biométrica");
+        lblTituloCaptura.setFont(FONT_SUBTITULO);
+        lblTituloCaptura.setForeground(COLOR_PRINCIPAL);
+        lblTituloCaptura.setHorizontalAlignment(SwingConstants.CENTER);
         
-        lblCamara = new JLabel("📸");
-        lblCamara.setFont(new Font("Segoe UI", Font.PLAIN, 48));
+        // Panel para la cámara con mejor diseño
+        JPanel panelCamara = new JPanel(new BorderLayout());
+        panelCamara.setBackground(COLOR_FONDO);
+        panelCamara.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        
+        lblCamara = new JLabel("CÁMARA INACTIVA");
+        lblCamara.setFont(FONT_LABEL);
         lblCamara.setHorizontalAlignment(SwingConstants.CENTER);
-        lblCamara.setPreferredSize(new Dimension(200, 150));
-        lblCamara.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        lblCamara.setVerticalAlignment(SwingConstants.CENTER);
+        lblCamara.setPreferredSize(new Dimension(250, 180));
+        lblCamara.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_BORDE, 2),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
         lblCamara.setOpaque(true);
-        lblCamara.setBackground(new Color(240, 240, 240));
+        lblCamara.setBackground(new Color(245, 245, 245));
+        lblCamara.setForeground(new Color(120, 120, 120));
         
-        btnActivarCamara = new JButton("📹 ACTIVAR CÁMARA");
-        btnActivarCamara.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnActivarCamara.setBackground(COLOR_SECUNDARIO);
-        btnActivarCamara.setForeground(COLOR_BLANCO);
-        btnActivarCamara.setPreferredSize(new Dimension(180, 35));
+        // Panel de botones de cámara
+        JPanel panelBotonesCamara = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        panelBotonesCamara.setBackground(COLOR_FONDO);
+        
+        btnActivarCamara = new JButton("ACTIVAR CÁMARA");
+        btnActivarCamara.setFont(FONT_BOTON);
+        btnActivarCamara.setBackground(COLOR_ACENTO);
+        btnActivarCamara.setForeground(Color.BLACK);
+        btnActivarCamara.setPreferredSize(new Dimension(150, 35));
         btnActivarCamara.setFocusPainted(false);
+        btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        btnActivarCamara.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        btnCapturarMuestra = new JButton("📸 CAPTURAR MUESTRA");
-        btnCapturarMuestra.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnCapturarMuestra.setBackground(COLOR_SECUNDARIO);
-        btnCapturarMuestra.setForeground(COLOR_BLANCO);
-        btnCapturarMuestra.setPreferredSize(new Dimension(180, 35));
+        btnCapturarMuestra = new JButton("CAPTURAR MUESTRA");
+        btnCapturarMuestra.setFont(FONT_BOTON);
+        btnCapturarMuestra.setBackground(COLOR_ACENTO);
+        btnCapturarMuestra.setForeground(Color.BLACK);
+        btnCapturarMuestra.setPreferredSize(new Dimension(170, 35));
         btnCapturarMuestra.setFocusPainted(false);
         btnCapturarMuestra.setEnabled(false);
+        btnCapturarMuestra.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        btnCapturarMuestra.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        panelBotonesCamara.add(btnActivarCamara);
+        panelBotonesCamara.add(btnCapturarMuestra);
+        
+        // Panel de progreso
+        JPanel panelProgreso = new JPanel(new BorderLayout());
+        panelProgreso.setBackground(COLOR_FONDO);
+        panelProgreso.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         
         progressCaptura = new JProgressBar(0, MUESTRAS_REQUERIDAS);
         progressCaptura.setStringPainted(true);
         progressCaptura.setString("0 / " + MUESTRAS_REQUERIDAS + " muestras");
-        progressCaptura.setPreferredSize(new Dimension(180, 25));
+        progressCaptura.setPreferredSize(new Dimension(200, 25));
+        progressCaptura.setBackground(COLOR_FONDO);
+        progressCaptura.setForeground(COLOR_ACENTO);
         
-        lblMuestrasCapturadas = new JLabel("✨ Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro");
-        lblMuestrasCapturadas.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        lblMuestrasCapturadas = new JLabel("Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro");
+        lblMuestrasCapturadas.setFont(FONT_LABEL);
+        lblMuestrasCapturadas.setForeground(new Color(100, 100, 100));
         lblMuestrasCapturadas.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Layout del panel captura
-        panelCaptura.setLayout(new BoxLayout(panelCaptura, BoxLayout.Y_AXIS));
-        panelCaptura.add(lblTituloCaptura);
-        panelCaptura.add(Box.createVerticalStrut(15));
-        panelCaptura.add(lblCamara);
-        panelCaptura.add(Box.createVerticalStrut(10));
-        panelCaptura.add(btnActivarCamara);
-        panelCaptura.add(Box.createVerticalStrut(5));
-        panelCaptura.add(btnCapturarMuestra);
-        panelCaptura.add(Box.createVerticalStrut(10));
-        panelCaptura.add(progressCaptura);
-        panelCaptura.add(Box.createVerticalStrut(5));
-        panelCaptura.add(lblMuestrasCapturadas);
+        // Ensamblar el panel
+        panelCamara.add(lblCamara, BorderLayout.CENTER);
+        
+        JPanel panelInfo = new JPanel(new BorderLayout());
+        panelInfo.setBackground(COLOR_FONDO);
+        panelInfo.add(progressCaptura, BorderLayout.CENTER);
+        panelInfo.add(lblMuestrasCapturadas, BorderLayout.SOUTH);
+        
+        panelCaptura.add(lblTituloCaptura, BorderLayout.NORTH);
+        panelCaptura.add(panelCamara, BorderLayout.CENTER);
+        
+        JPanel panelSur = new JPanel(new BorderLayout());
+        panelSur.setBackground(COLOR_FONDO);
+        panelSur.add(panelBotonesCamara, BorderLayout.CENTER);
+        panelSur.add(panelInfo, BorderLayout.SOUTH);
+        
+        panelCaptura.add(panelSur, BorderLayout.SOUTH);
     }
 
     /**
-     * 🎛️ Crear panel de botones
+     * Crear panel de botones
      */
     private void crearPanelBotones() {
-        panelBotones = new JPanel(new FlowLayout());
+        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         panelBotones.setBackground(COLOR_FONDO);
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
         
-        btnRegistrar = new JButton("✅ REGISTRAR USUARIO");
-        btnRegistrar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnRegistrar.setBackground(COLOR_SECUNDARIO);
-        btnRegistrar.setForeground(COLOR_BLANCO);
-        btnRegistrar.setPreferredSize(new Dimension(180, 40));
+        btnRegistrar = new JButton("REGISTRAR USUARIO");
+        btnRegistrar.setFont(FONT_BOTON);
+        btnRegistrar.setBackground(COLOR_ACENTO); // Azul como botón principal
+        btnRegistrar.setForeground(Color.BLACK);
         btnRegistrar.setFocusPainted(false);
+        btnRegistrar.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnRegistrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRegistrar.setEnabled(false);
         
-        btnCancelar = new JButton("❌ Cancelar");
-        btnCancelar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnCancelar.setBackground(COLOR_PELIGRO);
-        btnCancelar.setForeground(COLOR_BLANCO);
+        btnCancelar = new JButton("Cancelar");
+        btnCancelar.setFont(FONT_BOTON);
+        btnCancelar.setBackground(new Color(231, 76, 60)); // Rojo profesional igual al login
+        btnCancelar.setForeground(Color.BLACK);
         btnCancelar.setFocusPainted(false);
+        btnCancelar.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        btnVolverLogin = new JButton("🔙 Volver al Login");
-        btnVolverLogin.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnVolverLogin.setBackground(new Color(108, 117, 125));
-        btnVolverLogin.setForeground(COLOR_BLANCO);
+        btnVolverLogin = new JButton("Volver al Login");
+        btnVolverLogin.setFont(FONT_BOTON);
+        btnVolverLogin.setBackground(new Color(149, 165, 166)); // Gris profesional igual al login
+        btnVolverLogin.setForeground(Color.BLACK);
         btnVolverLogin.setFocusPainted(false);
+        btnVolverLogin.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnVolverLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         panelBotones.add(btnRegistrar);
         panelBotones.add(btnCancelar);
@@ -369,7 +427,7 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 🎯 Configurar eventos
+     * Configurar eventos
      */
     private void configurarEventos() {
         // Activar cámara
@@ -420,16 +478,16 @@ public class FormularioRegistroCompleto extends JFrame {
      * 💬 Mostrar mensaje de bienvenida
      */
     private void mostrarMensajeBienvenida() {
-        actualizarEstado("🎉 Bienvenido al registro del sistema");
+        actualizarEstado("Bienvenido al registro del sistema");
         
         SwingUtilities.invokeLater(() -> {
-            String mensaje = "🚀 REGISTRO DE NUEVO USUARIO\n\n" +
+            String mensaje = "REGISTRO DE NUEVO USUARIO\n\n" +
                     "Pasos a seguir:\n" +
-                    "1️⃣ Complete todos los campos del formulario\n" +
-                    "2️⃣ Active la cámara para captura facial\n" +
-                    "3️⃣ Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro\n" +
-                    "4️⃣ Confirme el registro\n\n" +
-                    "💡 Consejos:\n" +
+                    "1. Complete todos los campos del formulario\n" +
+                    "2. Active la cámara para captura facial\n" +
+                    "3. Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro\n" +
+                    "4. Confirme el registro\n\n" +
+                    "Consejos:\n" +
                     "• Use buena iluminación\n" +
                     "• Mantenga el rostro centrado\n" +
                     "• Evite obstrucciones (lentes, sombreros)\n" +
@@ -440,11 +498,11 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 📹 Activar cámara
+     * Activar cámara
      */
     private void activarCamara() {
         if (!camaraActiva) {
-            actualizarEstado("📹 Activando cámara...");
+            actualizarEstado("Activando cámara...");
             
             SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
                 @Override
@@ -458,14 +516,14 @@ public class FormularioRegistroCompleto extends JFrame {
                         boolean exito = get();
                         if (exito) {
                             camaraActiva = true;
-                            btnActivarCamara.setText("📹 CÁMARA ACTIVA");
+                            btnActivarCamara.setText("CÁMARA ACTIVA");
                             btnActivarCamara.setEnabled(false);
                             btnCapturarMuestra.setEnabled(true);
-                            lblCamara.setText("📹");
+                            lblCamara.setText("ACTIVA");
                             lblCamara.setBackground(COLOR_SECUNDARIO);
-                            actualizarEstado("✅ Cámara activa - Listo para captura");
+                            actualizarEstado("Cámara activa - Listo para captura");
                         } else {
-                            mostrarError("❌ No se pudo activar la cámara");
+                            mostrarError("No se pudo activar la cámara");
                         }
                     } catch (Exception e) {
                         mostrarError("Error activando cámara: " + e.getMessage());
@@ -478,7 +536,7 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 📸 Capturar muestra facial
+     * Capturar muestra facial
      */
     private void capturarMuestra() {
         if (!camaraActiva || capturaEnProceso) {
@@ -486,7 +544,7 @@ public class FormularioRegistroCompleto extends JFrame {
         }
         
         capturaEnProceso = true;
-        actualizarEstado("📸 Capturando muestra...");
+        actualizarEstado("Capturando muestra...");
         
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<BufferedImage, Void>() {
             @Override
@@ -511,16 +569,16 @@ public class FormularioRegistroCompleto extends JFrame {
                     if (imagen != null) {
                         muestrasFaciales.add(imagen);
                         actualizarProgreso();
-                        mostrarExito("✅ Muestra " + muestrasFaciales.size() + " capturada");
+                        mostrarExito("Muestra " + muestrasFaciales.size() + " capturada");
                         
                         if (muestrasFaciales.size() >= MUESTRAS_REQUERIDAS) {
                             btnCapturarMuestra.setEnabled(false);
-                            btnCapturarMuestra.setText("✅ CAPTURAS COMPLETAS");
-                            actualizarEstado("🎉 Todas las muestras capturadas correctamente");
+                            btnCapturarMuestra.setText("CAPTURAS COMPLETAS");
+                            actualizarEstado("Todas las muestras capturadas correctamente");
                             validarYHabilitarRegistro();
                         }
                     } else {
-                        mostrarError("❌ Error capturando imagen");
+                        mostrarError("Error capturando imagen");
                     }
                 } catch (Exception e) {
                     mostrarError("Error en captura: " + e.getMessage());
