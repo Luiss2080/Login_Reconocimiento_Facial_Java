@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.ArrayList;
+import com.reconocimiento.facial.utilidades.GestorConfiguracion;
 
 /**
  * Gestor de conexiones a la base de datos MySQL
@@ -20,16 +21,20 @@ public class ConexionBaseDatos {
     private List<Connection> conexionesUsadas;
     private boolean poolInicializado = false;
 
-    // Configuración de la base de datos
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/sistema_reconocimiento_facial";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "";
+    // Configuración de la base de datos (cargada desde sistema.properties)
+    private static final String DB_HOST = GestorConfiguracion.obtenerString("bd.host", "localhost");
+    private static final String DB_PUERTO = GestorConfiguracion.obtenerString("bd.puerto", "3306");
+    private static final String DB_NOMBRE = GestorConfiguracion.obtenerString("bd.nombre", "sistema_reconocimiento_facial");
+    private static final String DB_USER = GestorConfiguracion.obtenerString("bd.usuario", "root");
+    private static final String DB_PASSWORD = GestorConfiguracion.obtenerString("bd.password", "");
+    private static final String DB_URL = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", 
+                                                       DB_HOST, DB_PUERTO, DB_NOMBRE);
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     
-    // Configuración del pool
-    private static final int POOL_SIZE_MIN = 5;
-    private static final int POOL_SIZE_MAX = 20;
-    private static final int TIMEOUT_MS = 5000;
+    // Configuración del pool (cargada desde sistema.properties)
+    private static final int POOL_SIZE_MIN = GestorConfiguracion.obtenerInt("bd.pool_size_min", 5);
+    private static final int POOL_SIZE_MAX = GestorConfiguracion.obtenerInt("bd.pool_size_max", 20);
+    private static final int TIMEOUT_MS = GestorConfiguracion.obtenerInt("bd.timeout_connection", 5000);
 
     private ConexionBaseDatos() throws SQLException {
         conexionesUsadas = new ArrayList<>();
