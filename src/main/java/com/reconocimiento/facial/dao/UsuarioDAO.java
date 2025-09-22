@@ -34,7 +34,7 @@ public class UsuarioDAO {
         "SELECT * FROM usuarios WHERE nombre_usuario = ?";
 
     private static final String SQL_BUSCAR_POR_CORREO =
-        "SELECT * FROM usuarios WHERE correo_electronico = ?";
+        "SELECT * FROM usuarios WHERE email = ?";
 
     private static final String SQL_ACTUALIZAR_USUARIO =
         "UPDATE usuarios SET nombre_usuario = ?, correo_electronico = ?, contrasena_cifrada = ?, " +
@@ -483,8 +483,8 @@ public class UsuarioDAO {
 
         usuario.setIdUsuario(resultSet.getInt("id_usuario"));
         usuario.setNombreUsuario(resultSet.getString("nombre_usuario"));
-        usuario.setCorreoElectronico(resultSet.getString("correo_electronico"));
-        usuario.setContrasenaCifrada(resultSet.getString("contrasena_cifrada"));
+        usuario.setCorreoElectronico(resultSet.getString("email"));
+        usuario.setContrasenaCifrada(resultSet.getString("contrasena_hash"));
         usuario.setNombreCompleto(resultSet.getString("nombre_completo"));
         usuario.setEstaActivo(resultSet.getBoolean("esta_activo"));
 
