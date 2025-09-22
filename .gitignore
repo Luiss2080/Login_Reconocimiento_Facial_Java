@@ -1,0 +1,35 @@
+# Configuración para NetBeans
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+
+# Archivos de configuración sensibles
+config/database.properties
+logs/
+temp/
+imagenes/temp/
+imagenes/capturas/
+
+# Archivos de backup
+*.bak
+*.backup
+*.old
+
+# Archivos del sistema
+.cache/
+.gradle/
+build/

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- ========================================
+         CONFIGURACIÓN DE LOGGING PARA SISTEMA DE RECONOCIMIENTO FACIAL
+         ======================================== -->
+
+    <!-- Variables de configuración -->
+    <property name="LOG_DIR" value="logs" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+    <property name="LOG_PATTERN_COLOR" value="%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{36}) - %msg%n" />
+
+    <!-- Appender para consola -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN_COLOR}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender para archivo general -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/reconocimiento-facial.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/reconocimiento-facial.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Appender para errores -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/errores.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/errores.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Appender para auditoría -->
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/auditoria.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [AUDIT] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/auditoria.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>365</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Appender para base de datos -->
+    <appender name="DB_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/base-datos.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/base-datos.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ========================================
+         CONFIGURACIÓN DE LOGGERS ESPECÍFICOS
+         ======================================== -->
+
+    <!-- Logger para servicios de auditoría -->
+    <logger name="com.reconocimiento.facial.servicios.ServicioAuditoria" level="INFO" additivity="false">
+        <appender-ref ref="AUDIT_FILE" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Logger para base de datos -->
+    <logger name="com.reconocimiento.facial.basedatos" level="DEBUG" additivity="false">
+        <appender-ref ref="DB_FILE" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Logger para red neuronal -->
+    <logger name="com.reconocimiento.facial.neural" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Logger para procesamiento de imágenes -->
+    <logger name="com.reconocimiento.facial.procesamiento" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Logger para formularios -->
+    <logger name="com.reconocimiento.facial.formularios" level="WARN" additivity="false">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Reducir verbosidad de librerías externas -->
+    <logger name="org.bytedeco" level="WARN" />
+    <logger name="com.zaxxer.hikari" level="INFO" />
+    <logger name="org.hibernate" level="WARN" />
+    <logger name="com.mysql" level="WARN" />
+
+    <!-- ========================================
+         CONFIGURACIÓN ROOT
+         ======================================== -->
+
+    <!-- Logger raíz - captura todo lo demás -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+
+    <!-- ========================================
+         CONFIGURACIÓN CONDICIONAL PARA DESARROLLO
+         ======================================== -->
+
+    <!-- En desarrollo, usar nivel DEBUG -->
+    <springProfile name="dev">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </root>
+    </springProfile>
+
+    <!-- En producción, usar nivel INFO -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </root>
+    </springProfile>
+
+</configuration>
