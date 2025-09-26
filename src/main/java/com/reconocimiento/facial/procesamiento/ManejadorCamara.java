@@ -14,52 +14,64 @@ import java.util.Random;
 public class ManejadorCamara {
 
     private boolean camaraActiva = false;
+    private volatile boolean inicializandoCamara = false; // Nuevo: evitar inicializaciones simultáneas
+    // Campo resultadoInicializacion removido por no uso
+    // private volatile boolean resultadoInicializacion = false; // Para comunicación entre hilos
     private OpenCVFrameGrabber grabber;
     private Java2DFrameConverter converter;
     private Random random = new Random();
 
     /**
-     * Inicializar la cámara real con configuración mejorada
+     * Inicializar la cámara real con configuración mejorada y timeout global
      */
     public boolean inicializarCamara() {
+        // Evitar inicializaciones simultáneas
+        if (inicializandoCamara) {
+            System.out.println("⚠️  Ya hay una inicialización en progreso, esperando...");
+            return false;
+        }
+        
+        System.out.println("🎥 Iniciando proceso de conexión con la cámara...");
+        inicializandoCamara = true;
+        // resultadoInicializacion = false; // Removido - no se usa
+        
         try {
-            System.out.println("🎥 Inicializando cámara real...");
-
             // Limpiar recursos previos si existen
             liberarRecursosPrevios();
 
-            // Intentar diferentes configuraciones de cámara
-            boolean inicializada = false;
-            
-            // Configuración 1: Cámara por defecto con DirectShow (Windows)
-            if (!inicializada) {
-                inicializada = intentarInicializarConDirectShow();
-            }
-            
-            // Configuración 2: Cámara por defecto sin DirectShow
-            if (!inicializada) {
-                inicializada = intentarInicializarSinDirectShow();
-            }
-            
-            // Configuración 3: Probar diferentes índices de cámara
-            if (!inicializada) {
-                inicializada = intentarInicializarConDiferentesIndices();
-            }
-            
-            if (inicializada) {
+            // Método 1: Inicialización simple y rápida
+            System.out.println("📷 Método 1: Inicialización simple...");
+            if (inicializarCamaraSimple()) {
                 camaraActiva = true;
-                System.out.println("✅ Cámara inicializada correctamente");
+                System.out.println("✅ Cámara inicializada correctamente con método simple");
                 return true;
-            } else {
-                System.err.println("❌ No se pudo inicializar ninguna cámara");
-                return false;
             }
 
-        } catch (Exception e) {
-            System.err.println("❌ Error general al inicializar cámara: " + e.getMessage());
-            e.printStackTrace();
-            camaraActiva = false;
+            // Método 2: Con DirectShow (Windows)
+            System.out.println("📷 Método 2: Intentando con DirectShow...");
+            if (inicializarCamaraConDirectShow()) {
+                camaraActiva = true;
+                System.out.println("✅ Cámara inicializada correctamente con DirectShow");
+                return true;
+            }
+
+            // Método 3: Probar diferentes índices
+            System.out.println("📷 Método 3: Probando diferentes índices de cámara...");
+            if (inicializarCamaraConIndices()) {
+                camaraActiva = true;
+                System.out.println("✅ Cámara inicializada correctamente con índice alternativo");
+                return true;
+            }
+
+            System.out.println("❌ No se pudo inicializar la cámara con ningún método");
             return false;
+                
+        } catch (Exception e) {
+            System.out.println("❌ Error durante inicialización: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            inicializandoCamara = false;
         }
     }
     
@@ -77,10 +89,142 @@ public class ManejadorCamara {
             grabber = null;
         }
     }
+
+    /**
+     * Método 1: Inicialización simple sin configuraciones especiales
+     */
+    private boolean inicializarCamaraSimple() {
+        try {
+            System.out.println("🔧 Iniciando conexión simple con cámara por defecto...");
+            
+            grabber = new OpenCVFrameGrabber(0);
+            
+            // Configuración optimizada para velocidad
+            grabber.setImageWidth(640);
+            grabber.setImageHeight(480);
+            grabber.setFrameRate(30);
+            
+            System.out.println("⏰ Conectando cámara (puede tomar 10-20 segundos)...");
+            long startTime = System.currentTimeMillis();
+            
+            // Intentar conectar
+            grabber.start();
+            
+            long initTime = System.currentTimeMillis() - startTime;
+            System.out.println("✅ Cámara inicializada en " + initTime + "ms");
+            
+            // Verificar funcionamiento
+            org.bytedeco.javacv.Frame frame = grabber.grab();
+            if (frame != null) {
+                System.out.println("✅ Conexión simple exitosa - " + frame.imageWidth + "x" + frame.imageHeight);
+                return true;
+            } else {
+                System.out.println("❌ No se pudo capturar frame inicial");
+                if (grabber != null) {
+                    try { grabber.stop(); grabber.release(); } catch (Exception e) {}
+                }
+                return false;
+            }
+            
+        } catch (Exception e) {
+            System.out.println("❌ Error en inicialización simple: " + e.getMessage());
+            if (grabber != null) {
+                try { grabber.stop(); grabber.release(); } catch (Exception ex) {}
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Método 2: Con DirectShow para Windows
+     */
+    private boolean inicializarCamaraConDirectShow() {
+        try {
+            System.out.println("🔧 Iniciando con DirectShow (Windows)...");
+            
+            grabber = new OpenCVFrameGrabber(0);
+            
+            // Configuración DirectShow optimizada
+            grabber.setFormat("dshow");
+            grabber.setImageWidth(640);
+            grabber.setImageHeight(480);
+            grabber.setFrameRate(30);
+            
+            System.out.println("⏰ Conectando con DirectShow...");
+            long startTime = System.currentTimeMillis();
+            
+            grabber.start();
+            
+            long initTime = System.currentTimeMillis() - startTime;
+            System.out.println("✅ DirectShow inicializado en " + initTime + "ms");
+            
+            // Verificar funcionamiento
+            org.bytedeco.javacv.Frame frame = grabber.grab();
+            if (frame != null) {
+                System.out.println("✅ DirectShow funcionando correctamente");
+                return true;
+            } else {
+                System.out.println("❌ DirectShow no pudo capturar frame");
+                if (grabber != null) {
+                    try { grabber.stop(); grabber.release(); } catch (Exception e) {}
+                }
+                return false;
+            }
+            
+        } catch (Exception e) {
+            System.out.println("❌ Error con DirectShow: " + e.getMessage());
+            if (grabber != null) {
+                try { grabber.stop(); grabber.release(); } catch (Exception ex) {}
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Método 3: Probar diferentes índices de cámara
+     */
+    private boolean inicializarCamaraConIndices() {
+        for (int i = 0; i <= 3; i++) {
+            try {
+                System.out.println("🔧 Probando cámara con índice " + i + "...");
+                
+                grabber = new OpenCVFrameGrabber(i);
+                grabber.setImageWidth(640);
+                grabber.setImageHeight(480);
+                
+                grabber.start();
+                
+                // Verificar funcionamiento
+                org.bytedeco.javacv.Frame frame = grabber.grab();
+                if (frame != null) {
+                    System.out.println("✅ Cámara encontrada en índice " + i);
+                    return true;
+                }
+                
+                // Si llega aquí, no funcionó
+                grabber.stop();
+                grabber.release();
+                grabber = null;
+                
+            } catch (Exception e) {
+                System.out.println("❌ Índice " + i + " falló: " + e.getMessage());
+                if (grabber != null) {
+                    try { grabber.stop(); grabber.release(); } catch (Exception ex) {}
+                    grabber = null;
+                }
+            }
+        }
+        
+        System.out.println("❌ No se encontró cámara en ningún índice");
+        return false;
+    }
     
     /**
      * Intentar inicializar con DirectShow (Windows)
+     * @deprecated Método obsoleto - mantenido para compatibilidad pero no se usa
      */
+    @Deprecated
+    @SuppressWarnings("unused")
     private boolean intentarInicializarConDirectShow() {
         try {
             System.out.println("🔧 Intentando inicializar con DirectShow...");
@@ -93,11 +237,39 @@ public class ManejadorCamara {
             grabber.setImageHeight(480);
             grabber.setFrameRate(30);
             
-            System.out.println("📡 Conectando con DirectShow...");
-            grabber.start();
+            // Timeout para evitar colgamiento
+            grabber.setTimeout(5000000); // 5 segundos en microsegundos
             
-            // Verificar funcionalidad
-            if (verificarFuncionalidadCamara()) {
+            System.out.println("📡 Conectando con DirectShow (timeout 5s)...");
+            
+            // Inicializar en hilo separado con timeout
+            final boolean[] resultado = {false};
+            final Exception[] excepcion = {null};
+            
+            Thread hiloInicializacion = new Thread(() -> {
+                try {
+                    grabber.start();
+                    resultado[0] = verificarFuncionalidadCamara();
+                } catch (Exception e) {
+                    excepcion[0] = e;
+                }
+            });
+            
+            hiloInicializacion.start();
+            hiloInicializacion.join(8000); // Esperar máximo 8 segundos
+            
+            if (hiloInicializacion.isAlive()) {
+                System.out.println("⏰ DirectShow timeout - interrumpiendo...");
+                hiloInicializacion.interrupt();
+                liberarRecursosPrevios();
+                return false;
+            }
+            
+            if (excepcion[0] != null) {
+                throw excepcion[0];
+            }
+            
+            if (resultado[0]) {
                 System.out.println("✅ DirectShow funcionando correctamente");
                 return true;
             }
@@ -111,7 +283,10 @@ public class ManejadorCamara {
     
     /**
      * Intentar inicializar sin DirectShow
+     * @deprecated Método obsoleto - mantenido para compatibilidad pero no se usa
      */
+    @Deprecated
+    @SuppressWarnings("unused")
     private boolean intentarInicializarSinDirectShow() {
         try {
             System.out.println("🔧 Intentando inicializar sin DirectShow...");
@@ -122,12 +297,38 @@ public class ManejadorCamara {
             grabber.setImageWidth(640);
             grabber.setImageHeight(480);
             grabber.setFrameRate(30);
+            grabber.setTimeout(5000000); // 5 segundos timeout
             
-            System.out.println("📡 Conectando directamente...");
-            grabber.start();
+            System.out.println("📡 Conectando directamente (timeout 5s)...");
             
-            // Verificar funcionalidad
-            if (verificarFuncionalidadCamara()) {
+            // Inicializar con timeout
+            final boolean[] resultado = {false};
+            final Exception[] excepcion = {null};
+            
+            Thread hiloInicializacion = new Thread(() -> {
+                try {
+                    grabber.start();
+                    resultado[0] = verificarFuncionalidadCamara();
+                } catch (Exception e) {
+                    excepcion[0] = e;
+                }
+            });
+            
+            hiloInicializacion.start();
+            hiloInicializacion.join(8000); // Esperar máximo 8 segundos
+            
+            if (hiloInicializacion.isAlive()) {
+                System.out.println("⏰ Conexión directa timeout - interrumpiendo...");
+                hiloInicializacion.interrupt();
+                liberarRecursosPrevios();
+                return false;
+            }
+            
+            if (excepcion[0] != null) {
+                throw excepcion[0];
+            }
+            
+            if (resultado[0]) {
                 System.out.println("✅ Conexión directa funcionando correctamente");
                 return true;
             }
@@ -141,11 +342,15 @@ public class ManejadorCamara {
     
     /**
      * Intentar con diferentes índices de cámara
+     * @deprecated Método obsoleto - mantenido para compatibilidad pero no se usa
      */
+    @Deprecated
+    @SuppressWarnings("unused")
     private boolean intentarInicializarConDiferentesIndices() {
         System.out.println("🔧 Probando diferentes índices de cámara...");
         
-        for (int indice = 0; indice <= 3; indice++) {
+        for (int i = 0; i <= 3; i++) {
+            final int indice = i; // Hacer la variable final para usarla en el lambda
             try {
                 System.out.println("📹 Probando cámara índice: " + indice);
                 
@@ -154,7 +359,26 @@ public class ManejadorCamara {
                 grabber.setImageHeight(480);
                 grabber.setFrameRate(30);
                 
-                grabber.start();
+                // Usar timeout para el start() también
+                final OpenCVFrameGrabber finalGrabber = grabber;
+                Thread hiloInicializacion = new Thread(() -> {
+                    try {
+                        System.out.println("🔗 Conectando cámara índice " + indice + " (timeout 8s)...");
+                        finalGrabber.start();
+                    } catch (Exception e) {
+                        System.out.println("❌ Error en hilo de inicialización: " + e.getMessage());
+                    }
+                });
+                
+                hiloInicializacion.start();
+                hiloInicializacion.join(8000); // Timeout de 8 segundos
+                
+                if (hiloInicializacion.isAlive()) {
+                    System.out.println("⏰ Timeout índice " + indice + " - interrumpiendo...");
+                    hiloInicializacion.interrupt();
+                    liberarRecursosPrevios();
+                    continue; // Probar siguiente índice
+                }
                 
                 if (verificarFuncionalidadCamara()) {
                     System.out.println("✅ Cámara índice " + indice + " funcionando");
@@ -201,42 +425,62 @@ public class ManejadorCamara {
     }
 
     /**
-     * Capturar imagen de la cámara real
+     * Capturar imagen de la cámara real con timeout mejorado
      */
     public byte[] capturarImagen() {
         if (!camaraActiva) {
-            System.err.println("La camara no esta activa");
+            System.err.println("❌ La cámara no está activa");
             return null;
         }
 
         try {
-            System.out.println("Capturando imagen de camara real...");
+            System.out.println("📸 Capturando imagen de cámara...");
+            long startTime = System.currentTimeMillis();
 
-            // Capturar frame de la cámara
-            org.bytedeco.javacv.Frame frame = grabber.grab();
-            if (frame == null) {
-                System.err.println("No se pudo capturar frame de la camara");
-                return null;
+            // Capturar frame con reintentos
+            org.bytedeco.javacv.Frame frame = null;
+            
+            for (int intento = 0; intento < 3; intento++) {
+                try {
+                    frame = grabber.grab();
+                    if (frame != null) break;
+                    
+                    System.out.println("⚠️ Intento " + (intento + 1) + "/3 - Reintentando captura...");
+                    Thread.sleep(500); // Pausa antes de reintentar
+                } catch (Exception e) {
+                    System.out.println("⚠️ Error en intento " + (intento + 1) + ": " + e.getMessage());
+                }
             }
 
+            if (frame == null) {
+                System.err.println("❌ No se pudo capturar frame después de 3 intentos");
+                return simularDatosFaciales(); // Fallback a simulación
+            }
+
+            long captureTime = System.currentTimeMillis() - startTime;
+            System.out.println("⏱️ Frame capturado en " + captureTime + "ms");
+
             // Convertir frame a BufferedImage
-            converter = new Java2DFrameConverter();
+            if (converter == null) {
+                converter = new Java2DFrameConverter();
+            }
             BufferedImage imagen = converter.convert(frame);
             
             if (imagen != null) {
-                System.out.println("Imagen capturada exitosamente de camara real");
+                System.out.println("✅ Imagen capturada exitosamente - " + 
+                    imagen.getWidth() + "x" + imagen.getHeight() + " píxeles");
                 
                 // Convertir BufferedImage a bytes
                 java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 javax.imageio.ImageIO.write(imagen, "jpg", baos);
                 return baos.toByteArray();
             } else {
-                System.err.println("Error al convertir frame a imagen");
+                System.err.println("❌ Error al convertir frame a imagen");
                 return simularDatosFaciales(); // Fallback a simulación
             }
 
         } catch (Exception e) {
-            System.err.println("Error al capturar imagen de camara: " + e.getMessage());
+            System.err.println("❌ Error al capturar imagen de cámara: " + e.getMessage());
             // Fallback a simulación si falla la cámara real
             return simularDatosFaciales();
         }

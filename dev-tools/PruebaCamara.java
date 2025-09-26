@@ -1,4 +1,4 @@
-package com.reconocimiento.facial;
+package com.reconocimiento.facial.utilidades;
 
 import com.reconocimiento.facial.procesamiento.ManejadorCamara;
 

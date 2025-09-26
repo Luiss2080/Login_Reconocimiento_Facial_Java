@@ -14,6 +14,16 @@ import java.time.format.DateTimeFormatter;
  */
 public class VentanaBienvenida extends javax.swing.JFrame {
 
+    // ========== COLORES MODERNOS ========== 
+    // Colores disponibles para futuras mejoras de diseño
+    @SuppressWarnings("unused") private static final Color COLOR_PRIMARIO = new Color(52, 73, 94);
+    @SuppressWarnings("unused") private static final Color COLOR_SECUNDARIO = new Color(52, 152, 219);
+    @SuppressWarnings("unused") private static final Color COLOR_FONDO = new Color(236, 240, 241);
+    @SuppressWarnings("unused") private static final Color COLOR_BLANCO = new Color(255, 255, 255);
+    @SuppressWarnings("unused") private static final Color COLOR_TEXTO = new Color(44, 62, 80);
+    @SuppressWarnings("unused") private static final Color COLOR_EXITO = new Color(46, 204, 113);
+    @SuppressWarnings("unused") private static final Color COLOR_ERROR = new Color(231, 76, 60);
+
     // Variables de formulario
     private javax.swing.JLabel lblTituloBienvenida;
     private javax.swing.JLabel lblNombreUsuario;
@@ -107,7 +117,7 @@ public class VentanaBienvenida extends javax.swing.JFrame {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Usuario
-        JLabel lblUsuarioTitulo = new JLabel("🏷️ Usuario:");
+        JLabel lblUsuarioTitulo = new JLabel("● Usuario:");
         lblUsuarioTitulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
         gbc.gridx = 0; gbc.gridy = 2;
         panelInformacion.add(lblUsuarioTitulo, gbc);
@@ -141,12 +151,12 @@ public class VentanaBienvenida extends javax.swing.JFrame {
         panelInformacion.add(lblEstadoSesion, gbc);
 
         // Método de acceso
-        JLabel lblMetodoTitulo = new JLabel("🚪 Acceso:");
+        JLabel lblMetodoTitulo = new JLabel("→ Acceso:");
         lblMetodoTitulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
         gbc.gridx = 0; gbc.gridy = 5;
         panelInformacion.add(lblMetodoTitulo, gbc);
 
-        lblMetodoAcceso = new JLabel("🎥 Reconocimiento Facial");
+        lblMetodoAcceso = new JLabel("* Reconocimiento Facial");
         lblMetodoAcceso.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblMetodoAcceso.setForeground(new Color(156, 39, 176));
         gbc.gridx = 1; gbc.gridy = 5;
@@ -166,8 +176,8 @@ public class VentanaBienvenida extends javax.swing.JFrame {
         panelBotones.setBackground(new Color(245, 248, 250));
         panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
 
-        // Botón cerrar sesión
-        btnCerrarSesion = crearBoton("🚪 Cerrar Sesión", new Color(244, 67, 54), Color.WHITE);
+        // Botón cerrar sesión - Rosa claro moderno
+        btnCerrarSesion = crearBoton("X Cerrar Sesión", new Color(255, 205, 210), Color.BLACK);
         btnCerrarSesion.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -175,8 +185,8 @@ public class VentanaBienvenida extends javax.swing.JFrame {
             }
         });
 
-        // Botón configuración
-        btnConfiguracion = crearBoton("⚙️ Configuración", new Color(96, 125, 139), Color.WHITE);
+        // Botón configuración - Gris claro moderno
+        btnConfiguracion = crearBoton("◦ Configuración", new Color(224, 224, 224), Color.BLACK);
         btnConfiguracion.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -184,8 +194,8 @@ public class VentanaBienvenida extends javax.swing.JFrame {
             }
         });
 
-        // Botón ayuda
-        btnAyuda = crearBoton("❓ Ayuda", new Color(103, 58, 183), Color.WHITE);
+        // Botón ayuda - Azul claro moderno
+        btnAyuda = crearBoton("? Ayuda", new Color(187, 222, 251), Color.BLACK);
         btnAyuda.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -207,27 +217,42 @@ public class VentanaBienvenida extends javax.swing.JFrame {
     }
 
     /**
-     * Crear botón estilizado
+     * Crear botón moderno con efectos hover
      */
     private JButton crearBoton(String texto, Color colorFondo, Color colorTexto) {
         JButton boton = new JButton(texto);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         boton.setBackground(colorFondo);
-        boton.setForeground(colorTexto);
-        boton.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
+        boton.setForeground(Color.BLACK); // Texto negro siempre
         boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // Efectos hover
+        boton.setPreferredSize(new Dimension(160, 40));
+        
+        // Bordes redondeados simulados con padding
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(colorFondo, 1),
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        
+        // Efectos hover modernos
+        Color colorHover = colorFondo.brighter();
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                boton.setBackground(colorFondo.brighter());
+                boton.setBackground(colorHover);
+                boton.setForeground(Color.BLACK);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorHover, 2),
+                    BorderFactory.createEmptyBorder(9, 19, 9, 19)
+                ));
             }
-
-            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 boton.setBackground(colorFondo);
+                boton.setForeground(Color.BLACK);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorFondo, 1),
+                    BorderFactory.createEmptyBorder(10, 20, 10, 20)
+                ));
             }
         });
 
@@ -339,14 +364,14 @@ public class VentanaBienvenida extends javax.swing.JFrame {
     private void mostrarAyuda() {
         String mensajeAyuda = "🔗 SISTEMA DE RECONOCIMIENTO FACIAL\n\n" +
                              "✅ FUNCIONES DISPONIBLES:\n\n" +
-                             "🎥 Reconocimiento Facial:\n" +
+                             "* Reconocimiento Facial:\n" +
                              "   • Sistema de autenticación biométrica avanzado\n" +
                              "   • Utiliza redes neuronales para identificación\n" +
                              "   • Alta precisión y seguridad\n\n" +
                              "🔐 Login con Contraseña:\n" +
                              "   • Método tradicional de autenticación\n" +
                              "   • Respaldo al reconocimiento facial\n\n" +
-                             "📝 Registro de Usuarios:\n" +
+                             "+ Registro de Usuarios:\n" +
                              "   • Captura automática de características faciales\n" +
                              "   • Entrenamiento personalizado de red neuronal\n" +
                              "   • Validación completa de datos\n\n" +
@@ -380,7 +405,7 @@ public class VentanaBienvenida extends javax.swing.JFrame {
      */
     public void setMetodoAcceso(String metodo) {
         if (metodo.equalsIgnoreCase("FACIAL")) {
-            lblMetodoAcceso.setText("🎥 Reconocimiento Facial");
+            lblMetodoAcceso.setText("* Reconocimiento Facial");
             lblMetodoAcceso.setForeground(new Color(76, 175, 80));
         } else if (metodo.equalsIgnoreCase("CONTRASEÑA")) {
             lblMetodoAcceso.setText("🔐 Contraseña");

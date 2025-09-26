@@ -1,35 +1,89 @@
-# Configuración para NetBeans
+# ========== ARCHIVOS DE COMPILACIÓN ==========
 target/
 *.class
 *.jar
 *.war
 *.ear
-*.log
+*.nar
+dependency-reduced-pom.xml
+
+# ========== ARCHIVOS TEMPORALES ==========
 *.tmp
-.DS_Store
-Thumbs.db
+*.temp
+*~
+*.swp
+*.swo
+
+# ========== LOGS ==========
+*.log
+logs/
+temp/
+
+# ========== IDEs ==========
+# IntelliJ IDEA
 .idea/
 *.iml
 *.ipr
 *.iws
-.vscode/
+out/
+
+# Eclipse
+.metadata
 .settings/
 .project
 .classpath
+bin/
 
-# Archivos de configuración sensibles
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# ========== SISTEMAS OPERATIVOS ==========
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# ========== MAVEN ==========
+dependency-reduced-pom.xml
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ========== ARCHIVOS SENSIBLES ==========
 config/database.properties
-logs/
-temp/
-imagenes/temp/
-imagenes/capturas/
+config/sistema.properties.local
+*.env
 
-# Archivos de backup
+# ========== ARCHIVOS DE BACKUP ==========
 *.bak
 *.backup
 *.old
+*.orig
 
-# Archivos del sistema
+# ========== ARCHIVOS DE PROCESAMIENTO ==========
+imagenes/temp/
+imagenes/capturas/
+modelos/temp/
+src/main/resources/imagenes/capturas/
+src/main/resources/imagenes/temp/
+
+# ========== CACHE ==========
 .cache/
 .gradle/
 build/
+node_modules/

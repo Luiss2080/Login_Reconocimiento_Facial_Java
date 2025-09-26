@@ -33,8 +33,11 @@ public class FormularioLoginNuevo extends JFrame {
     
     // Componentes de reconocimiento facial
     private JLabel lblCamara;
+    private JLabel lblVistaPrevia; // Nueva: Para mostrar video en tiempo real
     private JButton btnActivarCamara;
     private JButton btnLoginFacial;
+    private JPanel panelVideoContainer; // Contenedor del video
+    private Timer videoTimer; // Timer para actualizar frames
     
     // Componentes generales
     private JLabel lblTitulo;
@@ -53,7 +56,7 @@ public class FormularioLoginNuevo extends JFrame {
 
     // ========== CONSTANTES DE DISEÑO PROFESIONAL ==========
     private static final Color COLOR_PRINCIPAL = new Color(52, 73, 94);      // Azul oscuro profesional
-    private static final Color COLOR_ACENTO = new Color(41, 128, 185);       // Azul claro
+    @SuppressWarnings("unused") private static final Color COLOR_ACENTO = new Color(41, 128, 185);       // Azul claro
     private static final Color COLOR_EXITO = new Color(39, 174, 96);         // Verde
     private static final Color COLOR_FONDO = new Color(248, 249, 250);       // Gris muy claro
     private static final Color COLOR_BLANCO = Color.WHITE;
@@ -63,7 +66,7 @@ public class FormularioLoginNuevo extends JFrame {
     private static final Font FONT_TITULO = new Font("Segoe UI", Font.BOLD, 28);
     private static final Font FONT_SUBTITULO = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Font FONT_LABEL = new Font("Segoe UI", Font.PLAIN, 12);
-    private static final Font FONT_BOTON = new Font("Segoe UI", Font.BOLD, 13);
+    @SuppressWarnings("unused") private static final Font FONT_BOTON = new Font("Segoe UI", Font.BOLD, 13);
 
     /**
      * Constructor principal - Inicializa toda la interfaz y servicios
@@ -203,14 +206,8 @@ public class FormularioLoginNuevo extends JFrame {
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         
-        btnLoginCredenciales = new JButton("INGRESAR");
-        btnLoginCredenciales.setFont(FONT_BOTON);
-        btnLoginCredenciales.setBackground(COLOR_PRINCIPAL);
-        btnLoginCredenciales.setForeground(Color.BLACK);
-        btnLoginCredenciales.setPreferredSize(new Dimension(280, 42));
-        btnLoginCredenciales.setFocusPainted(false);
-        btnLoginCredenciales.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        btnLoginCredenciales.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLoginCredenciales = crearBotonLogin("🔐 INGRESAR", 
+            COLOR_PRINCIPAL, new Color(25, 42, 67));
         
         // Layout del panel credenciales con mejor espaciado
         panelCredenciales.setLayout(new BoxLayout(panelCredenciales, BoxLayout.Y_AXIS));
@@ -236,105 +233,305 @@ public class FormularioLoginNuevo extends JFrame {
     }
 
     /**
-     * Crear panel de reconocimiento facial con diseño profesional
+     * Crear panel de reconocimiento facial moderno con vista previa
      */
     private void crearPanelFacial() {
         panelFacial = new JPanel();
         panelFacial.setBackground(COLOR_BLANCO);
         panelFacial.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDE, 1),
-            BorderFactory.createEmptyBorder(25, 25, 25, 25)
+            BorderFactory.createLineBorder(new Color(52, 152, 219), 2), // Borde azul moderno
+            BorderFactory.createEmptyBorder(30, 25, 25, 25)
         ));
+        panelFacial.setLayout(new BoxLayout(panelFacial, BoxLayout.Y_AXIS));
         
-        JLabel lblTituloFacial = new JLabel("Reconocimiento Facial");
-        lblTituloFacial.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTituloFacial.setForeground(COLOR_ACENTO);
+        // Título con icono y estilo moderno
+        JLabel lblTituloFacial = new JLabel("* Reconocimiento Facial");
+        lblTituloFacial.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblTituloFacial.setForeground(new Color(52, 152, 219));
         lblTituloFacial.setHorizontalAlignment(SwingConstants.CENTER);
+        lblTituloFacial.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        lblCamara = new JLabel("CAMARA DESACTIVADA");
-        lblCamara.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblCamara.setHorizontalAlignment(SwingConstants.CENTER);
-        lblCamara.setVerticalAlignment(SwingConstants.CENTER);
-        lblCamara.setPreferredSize(new Dimension(280, 180));
-        lblCamara.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDE, 2),
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        ));
-        lblCamara.setOpaque(true);
-        lblCamara.setBackground(new Color(240, 240, 240));
-        lblCamara.setForeground(new Color(120, 120, 120));
+        // Contenedor de video con diseño moderno
+        crearContenedorVideo();
         
-        btnActivarCamara = new JButton("ACTIVAR CAMARA");
-        btnActivarCamara.setFont(FONT_BOTON);
-        btnActivarCamara.setBackground(COLOR_ACENTO);
-        btnActivarCamara.setForeground(Color.BLACK);
-        btnActivarCamara.setPreferredSize(new Dimension(280, 40));
+        // Panel de controles con mejor distribución
+        JPanel panelControles = new JPanel();
+        panelControles.setLayout(new BoxLayout(panelControles, BoxLayout.Y_AXIS));
+        panelControles.setBackground(COLOR_BLANCO);
+        panelControles.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Botón activar cámara con diseño moderno
+        btnActivarCamara = new JButton("▶ ACTIVAR CÁMARA");
+        btnActivarCamara.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnActivarCamara.setBackground(new Color(187, 222, 251)); // Azul muy claro
+        btnActivarCamara.setForeground(Color.BLACK); // Texto negro
+        btnActivarCamara.setPreferredSize(new Dimension(300, 45));
+        btnActivarCamara.setMaximumSize(new Dimension(300, 45));
         btnActivarCamara.setFocusPainted(false);
-        btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         btnActivarCamara.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnActivarCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        btnLoginFacial = new JButton("RECONOCER ROSTRO");
-        btnLoginFacial.setFont(FONT_BOTON);
-        btnLoginFacial.setBackground(COLOR_EXITO);
-        btnLoginFacial.setForeground(Color.BLACK);
-        btnLoginFacial.setPreferredSize(new Dimension(280, 42));
+        // Efecto hover para el botón
+        btnActivarCamara.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (btnActivarCamara.isEnabled()) {
+                    btnActivarCamara.setBackground(new Color(144, 202, 249)); // Azul claro
+                    btnActivarCamara.setForeground(Color.BLACK); // Texto negro
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (btnActivarCamara.isEnabled() && !btnActivarCamara.getText().contains("ACTIVA")) {
+                    btnActivarCamara.setBackground(new Color(187, 222, 251)); // Azul muy claro
+                    btnActivarCamara.setForeground(Color.BLACK); // Texto negro
+                }
+            }
+        });
+        
+        // Botón reconocimiento con diseño premium
+        btnLoginFacial = new JButton("● RECONOCER ROSTRO");
+        btnLoginFacial.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnLoginFacial.setBackground(new Color(200, 230, 201)); // Verde muy claro
+        btnLoginFacial.setForeground(Color.BLACK); // Texto negro
+        btnLoginFacial.setPreferredSize(new Dimension(300, 45));
+        btnLoginFacial.setMaximumSize(new Dimension(300, 45));
         btnLoginFacial.setFocusPainted(false);
         btnLoginFacial.setEnabled(false);
-        btnLoginFacial.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnLoginFacial.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         btnLoginFacial.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLoginFacial.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Layout del panel facial con mejor espaciado
-        panelFacial.setLayout(new BoxLayout(panelFacial, BoxLayout.Y_AXIS));
+        // Efecto hover para botón reconocimiento
+        btnLoginFacial.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (btnLoginFacial.isEnabled()) {
+                    btnLoginFacial.setBackground(new Color(165, 214, 167)); // Verde claro
+                    btnLoginFacial.setForeground(Color.BLACK); // Texto negro
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (btnLoginFacial.isEnabled()) {
+                    btnLoginFacial.setBackground(new Color(200, 230, 201)); // Verde muy claro
+                    btnLoginFacial.setForeground(Color.BLACK); // Texto negro
+                }
+            }
+        });
+        
+        // Agregar componentes con espaciado compacto
         panelFacial.add(lblTituloFacial);
-        panelFacial.add(Box.createVerticalStrut(20));
-        panelFacial.add(lblCamara);
         panelFacial.add(Box.createVerticalStrut(15));
-        panelFacial.add(btnActivarCamara);
-        panelFacial.add(Box.createVerticalStrut(10));
-        panelFacial.add(btnLoginFacial);
+        panelFacial.add(panelVideoContainer);
+        panelFacial.add(Box.createVerticalStrut(15));
         
-        // Centrar todos los componentes
-        lblTituloFacial.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelControles.add(btnActivarCamara);
+        panelControles.add(Box.createVerticalStrut(10));
+        panelControles.add(btnLoginFacial);
+        
+        panelFacial.add(panelControles);
+        panelFacial.add(Box.createVerticalStrut(10));
+    }
+    
+    /**
+     * Crear contenedor de video compacto y responsivo
+     */
+    private void crearContenedorVideo() {
+        panelVideoContainer = new JPanel(new BorderLayout());
+        panelVideoContainer.setPreferredSize(new Dimension(280, 180));
+        panelVideoContainer.setMaximumSize(new Dimension(280, 180));
+        panelVideoContainer.setMinimumSize(new Dimension(280, 180));
+        panelVideoContainer.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(149, 165, 166), 2),
+            BorderFactory.createEmptyBorder(3, 3, 3, 3)
+        ));
+        panelVideoContainer.setBackground(new Color(44, 62, 80));
+        panelVideoContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Vista previa de video
+        lblVistaPrevia = new JLabel();
+        lblVistaPrevia.setHorizontalAlignment(SwingConstants.CENTER);
+        lblVistaPrevia.setVerticalAlignment(SwingConstants.CENTER);
+        lblVistaPrevia.setOpaque(true);
+        lblVistaPrevia.setBackground(new Color(44, 62, 80));
+        lblVistaPrevia.setForeground(Color.WHITE);
+        lblVistaPrevia.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        
+        // Estado inicial
+        mostrarEstadoCamara("* Cámara Desconectada", new Color(231, 76, 60));
+        
+        panelVideoContainer.add(lblVistaPrevia, BorderLayout.CENTER);
+        
+        // Inicializar timer para actualización de video
+        inicializarTimerVideo();
+    }
+    
+    /**
+     * Mostrar estado de la cámara con estilo visual
+     */
+    private void mostrarEstadoCamara(String mensaje, Color color) {
+        lblVistaPrevia.setText("<html><center>" + mensaje + "</center></html>");
+        lblVistaPrevia.setBackground(color);
+        lblVistaPrevia.setIcon(null);
+    }
+    
+    /**
+     * Inicializar timer para actualización de video en tiempo real
+     */
+    private void inicializarTimerVideo() {
+        videoTimer = new Timer(33, e -> { // ~30 FPS
+            if (camaraActiva && manejadorCamara != null) {
+                try {
+                    BufferedImage frame = manejadorCamara.capturarImagenBuffered();
+                    if (frame != null) {
+                        // Redimensionar imagen para el contenedor compacto
+                        Image imagenEscalada = frame.getScaledInstance(274, 174, Image.SCALE_SMOOTH);
+                        ImageIcon icono = new ImageIcon(imagenEscalada);
+                        
+                        SwingUtilities.invokeLater(() -> {
+                            lblVistaPrevia.setIcon(icono);
+                            lblVistaPrevia.setText("");
+                        });
+                    }
+                } catch (Exception ex) {
+                    // Si hay error, no actualizar frame pero mantener el timer
+                }
+            }
+        });
+    }
+    
+    /**
+     * Iniciar stream de video
+     */
+    private void iniciarStreamVideo() {
+        if (videoTimer != null && !videoTimer.isRunning()) {
+            videoTimer.start();
+            mostrarEstadoCamara("* Transmisión Activa", new Color(46, 204, 113));
+        }
+    }
+    
+    /**
+     * Detener stream de video  
+     */
+    private void detenerStreamVideo() {
+        if (videoTimer != null && videoTimer.isRunning()) {
+            videoTimer.stop();
+        }
+        mostrarEstadoCamara("* Cámara Desconectada", new Color(231, 76, 60));
         lblCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnActivarCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLoginFacial.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
     /**
-     * Crear panel de botones adicionales con diseño profesional
+     * Crear panel de botones modernos con iconos y efectos
      */
     private void crearPanelBotones() {
-        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         panelBotones.setBackground(COLOR_FONDO);
-        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(25, 0, 35, 0));
         
-        btnRegistrarse = new JButton("Registrarse");
-        btnRegistrarse.setFont(FONT_BOTON);
-        btnRegistrarse.setBackground(new Color(230, 126, 34)); // Naranja profesional
-        btnRegistrarse.setForeground(Color.BLACK);
-        btnRegistrarse.setFocusPainted(false);
-        btnRegistrarse.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btnRegistrarse.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Registrarse moderno - Amarillo muy claro
+        btnRegistrarse = crearBotonModerno("+ Registrarse", 
+            new Color(255, 235, 59), new Color(255, 213, 79)); // Amarillo muy claro
         
-        btnAyuda = new JButton("Ayuda");
-        btnAyuda.setFont(FONT_BOTON);
-        btnAyuda.setBackground(new Color(149, 165, 166)); // Gris profesional
-        btnAyuda.setForeground(Color.BLACK);
-        btnAyuda.setFocusPainted(false);
-        btnAyuda.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btnAyuda.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Ayuda moderno - Azul muy claro
+        btnAyuda = crearBotonModerno("? Ayuda", 
+            new Color(187, 222, 251), new Color(144, 202, 249)); // Azul super claro
         
-        btnSalir = new JButton("Salir");
-        btnSalir.setFont(FONT_BOTON);
-        btnSalir.setBackground(new Color(231, 76, 60)); // Rojo profesional
-        btnSalir.setForeground(Color.BLACK);
-        btnSalir.setFocusPainted(false);
-        btnSalir.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btnSalir.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Salir moderno - Rosa claro  
+        btnSalir = crearBotonModerno("X Salir", 
+            new Color(255, 205, 210), new Color(255, 138, 128)); // Rosa muy claro
         
         panelBotones.add(btnRegistrarse);
         panelBotones.add(btnAyuda);
         panelBotones.add(btnSalir);
+    }
+    
+    /**
+     * Crear botón moderno con efectos hover
+     */
+    private JButton crearBotonModerno(String texto, Color colorNormal, Color colorHover) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setBackground(colorNormal);
+        
+        // FORZAR texto negro para todos los botones
+        boton.setForeground(Color.BLACK);
+        
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setPreferredSize(new Dimension(140, 40));
+        
+        // Bordes redondeados simulados con padding
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(colorNormal, 1),
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        
+        // Efectos hover modernos
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(colorHover);
+                boton.setForeground(Color.BLACK); // FORZAR texto negro siempre
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorHover, 2),
+                    BorderFactory.createEmptyBorder(9, 19, 9, 19)
+                ));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(colorNormal);
+                boton.setForeground(Color.BLACK); // FORZAR texto negro siempre
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorNormal, 1),
+                    BorderFactory.createEmptyBorder(10, 20, 10, 20)
+                ));
+            }
+        });
+        
+        return boton;
+    }
+    
+    /**
+     * Crear botón de login principal con diseño especial
+     */
+    private JButton crearBotonLogin(String texto, Color colorNormal, Color colorHover) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(colorNormal);
+        boton.setForeground(Color.BLACK); // FORZAR texto negro siempre
+        boton.setFocusPainted(false);
+        boton.setPreferredSize(new Dimension(280, 45));
+        boton.setMaximumSize(new Dimension(280, 45));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Bordes modernos
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(colorNormal, 1),
+            BorderFactory.createEmptyBorder(12, 20, 12, 20)
+        ));
+        
+        // Efectos hover elegantes
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(colorHover);
+                boton.setForeground(Color.BLACK); // FORZAR texto negro siempre
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorHover, 2),
+                    BorderFactory.createEmptyBorder(11, 19, 11, 19)
+                ));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(colorNormal);
+                boton.setForeground(Color.BLACK); // FORZAR texto negro siempre
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorNormal, 1),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+            }
+        });
+        
+        return boton;
     }
 
     /**
@@ -343,19 +540,37 @@ public class FormularioLoginNuevo extends JFrame {
     private void configurarLayout() {
         setLayout(new BorderLayout());
         
-        // Panel título con mejor spacing
-        panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
-        panelTitulo.add(Box.createVerticalStrut(20));
-        panelTitulo.add(lblTitulo);
-        panelTitulo.add(Box.createVerticalStrut(8));
-        panelTitulo.add(lblSubtitulo);
-        panelTitulo.add(Box.createVerticalStrut(20));
+        // Panel título centrado y moderno
+        panelTitulo.setLayout(new BorderLayout());
+        JPanel contenedorTitulo = new JPanel();
+        contenedorTitulo.setLayout(new BoxLayout(contenedorTitulo, BoxLayout.Y_AXIS));
+        contenedorTitulo.setBackground(COLOR_PRINCIPAL);
         
-        // Panel opciones con espacio adecuado
+        // Centrar elementos del título
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        contenedorTitulo.add(Box.createVerticalStrut(25));
+        contenedorTitulo.add(lblTitulo);
+        contenedorTitulo.add(Box.createVerticalStrut(10));
+        contenedorTitulo.add(lblSubtitulo);
+        contenedorTitulo.add(Box.createVerticalStrut(25));
+        
+        panelTitulo.add(contenedorTitulo, BorderLayout.CENTER);
+        
+        // Panel opciones responsivo con scroll
         panelOpciones.setLayout(new GridLayout(1, 2, 30, 0));
-        panelOpciones.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        panelOpciones.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+        
+        // Agregar scroll al panel facial para responsividad
+        JScrollPane scrollFacial = new JScrollPane(panelFacial);
+        scrollFacial.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollFacial.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollFacial.setBorder(null);
+        scrollFacial.getViewport().setBackground(COLOR_BLANCO);
+        
         panelOpciones.add(panelCredenciales);
-        panelOpciones.add(panelFacial);
+        panelOpciones.add(scrollFacial);
         
         // Panel central que contiene opciones y estado
         JPanel panelCentro = new JPanel(new BorderLayout());
@@ -436,7 +651,7 @@ public class FormularioLoginNuevo extends JFrame {
     private void configurarVentana() {
         setTitle("Sistema de Autenticacion Empresarial");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(950, 700);
+        setSize(950, 750); // Aumentar altura para mostrar todos los botones
         setLocationRelativeTo(null);
         setResizable(false);
         
@@ -508,42 +723,126 @@ public class FormularioLoginNuevo extends JFrame {
     }
 
     /**
-     * 📹 Activar sistema de cámara
+     * 📹 Activar sistema de cámara con progreso visual
      */
     private void activarCamara() {
         if (!camaraActiva) {
-            actualizarEstado("Activando camara...");
+            // Deshabilitar botón durante inicialización
+            btnActivarCamara.setEnabled(false);
+            btnActivarCamara.setText("INICIALIZANDO...");
+            btnActivarCamara.setBackground(new Color(255, 193, 7)); // Amarillo
             
-            SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+            System.out.println("🎥 DEBUG: Iniciando activación de cámara...");
+            
+            SwingWorker<Boolean, String> worker = new SwingWorker<Boolean, String>() {
+                
                 @Override
                 protected Boolean doInBackground() throws Exception {
-                    return manejadorCamara.inicializarCamara();
+                    // Publicar progreso paso a paso
+                    publish("Verificando drivers de cámara...");
+                    Thread.sleep(1000);
+                    
+                    publish("Detectando cámaras disponibles...");
+                    Thread.sleep(1500);
+                    
+                    publish("Inicializando conexión (puede tomar 30-60 segundos)...");
+                    
+                    // Crear un timer para mostrar progreso durante la inicialización
+                    Timer progressTimer = new Timer(3000, e -> {
+                        String[] mensajes = {
+                            "Conectando con hardware de cámara...",
+                            "Configurando resolución y formato...", 
+                            "Estableciendo parámetros de captura...",
+                            "Validando funcionamiento...",
+                            "Finalizando inicialización..."
+                        };
+                        
+                        int index = (int)(System.currentTimeMillis() / 3000) % mensajes.length;
+                        publish(mensajes[index]);
+                    });
+                    progressTimer.start();
+                    
+                    try {
+                        System.out.println("🎥 DEBUG: Ejecutando inicializarCamara() en background...");
+                        boolean resultado = manejadorCamara.inicializarCamara();
+                        System.out.println("🎥 DEBUG: Resultado inicializarCamara(): " + resultado);
+                        return resultado;
+                    } finally {
+                        progressTimer.stop();
+                    }
+                }
+                
+                @Override
+                protected void process(java.util.List<String> chunks) {
+                    // Actualizar estado con el último mensaje
+                    if (!chunks.isEmpty()) {
+                        String ultimoMensaje = chunks.get(chunks.size() - 1);
+                        actualizarEstado(ultimoMensaje);
+                        
+                        // Mostrar progreso en vista previa
+                        mostrarEstadoCamara("🔄 " + ultimoMensaje, new Color(243, 156, 18));
+                    }
                 }
                 
                 @Override
                 protected void done() {
                     try {
+                        System.out.println("🎥 DEBUG: SwingWorker.done() ejecutándose...");
                         boolean exito = get();
+                        System.out.println("🎥 DEBUG: Éxito obtenido: " + exito);
+                        
                         if (exito) {
                             camaraActiva = true;
-                            btnActivarCamara.setText("CAMARA ACTIVA");
-                            btnActivarCamara.setBackground(new Color(40, 167, 69)); // Verde
+                            
+                            // Actualizar botón con estilo moderno
+                            btnActivarCamara.setText("✅ CÁMARA ACTIVA");
+                            btnActivarCamara.setBackground(new Color(46, 204, 113)); // Verde moderno
                             btnActivarCamara.setEnabled(false);
                             btnLoginFacial.setEnabled(true);
-                            lblCamara.setText("CAMARA CONECTADA");
-                            lblCamara.setBackground(new Color(40, 167, 69));
-                            lblCamara.setForeground(Color.WHITE);
-                            actualizarEstado("Camara activa - Listo para reconocimiento");
+                            
+                            // Iniciar stream de video en tiempo real
+                            iniciarStreamVideo();
+                            
+                            actualizarEstado("✅ Cámara activa - Vista previa habilitada");
+                            System.out.println("✅ DEBUG: Cámara activada exitosamente en UI");
                         } else {
-                            mostrarError("No se pudo activar la camara");
+                            // Restaurar estado del botón con diseño moderno
+                            btnActivarCamara.setText("🔌 ACTIVAR CÁMARA");
+                            btnActivarCamara.setBackground(new Color(52, 152, 219));
+                            btnActivarCamara.setEnabled(true);
+                            
+                            // Mostrar error en vista previa
+                            detenerStreamVideo();
+                            
+                            System.out.println("❌ DEBUG: Fallo en activación de cámara");
+                            mostrarError("No se pudo activar la cámara.\n\n" +
+                                      "Posibles soluciones:\n" +
+                                      "• Verifique que no esté siendo usada por otra aplicación\n" +
+                                      "• Revise permisos de cámara en Windows\n" +
+                                      "• Asegúrese de que los drivers estén instalados");
+                            actualizarEstado("❌ Error activando cámara");
                         }
                     } catch (Exception e) {
+                        // Restaurar estado del botón con diseño moderno
+                        btnActivarCamara.setText("🔌 ACTIVAR CÁMARA");
+                        btnActivarCamara.setBackground(new Color(52, 152, 219));
+                        btnActivarCamara.setEnabled(true);
+                        
+                        // Mostrar error en vista previa
+                        mostrarEstadoCamara("❌ Error de Conexión", new Color(231, 76, 60));
+                        
+                        System.out.println("❌ DEBUG: Excepción en SwingWorker: " + e.getMessage());
+                        e.printStackTrace();
                         mostrarError("Error activando cámara: " + e.getMessage());
+                        actualizarEstado("❌ Error en activación de cámara");
                     }
                 }
             };
             
             worker.execute();
+        } else {
+            System.out.println("ℹ️ DEBUG: Cámara ya está activa");
+            actualizarEstado("ℹ️ Cámara ya está activa");
         }
     }
 
@@ -692,6 +991,8 @@ public class FormularioLoginNuevo extends JFrame {
             JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
         });
     }
+
+
 
     /**
      * 🚀 Método principal para ejecutar la aplicación

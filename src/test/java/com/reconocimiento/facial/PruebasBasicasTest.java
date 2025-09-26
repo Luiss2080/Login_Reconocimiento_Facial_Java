@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.IOException;
-import java.util.Properties;
+// Properties import removido - no se utiliza en esta clase
 
 /**
  * 🧪 PRUEBAS BÁSICAS DEL SISTEMA DE RECONOCIMIENTO FACIAL

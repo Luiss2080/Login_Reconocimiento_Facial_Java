@@ -60,10 +60,10 @@ public class FormularioRegistroCompleto extends JFrame {
     // ========== CONSTANTES DE DISEÑO PROFESIONAL ==========
     private static final Color COLOR_PRINCIPAL = new Color(52, 73, 94);      // Azul oscuro profesional
     private static final Color COLOR_ACENTO = new Color(41, 128, 185);       // Azul claro
-    private static final Color COLOR_EXITO = new Color(39, 174, 96);         // Verde
+    @SuppressWarnings("unused") private static final Color COLOR_EXITO = new Color(39, 174, 96);         // Verde
     private static final Color COLOR_FONDO = new Color(248, 249, 250);       // Gris muy claro
     private static final Color COLOR_BLANCO = Color.WHITE;
-    private static final Color COLOR_TEXTO = new Color(44, 62, 80);          // Texto oscuro
+    @SuppressWarnings("unused") private static final Color COLOR_TEXTO = new Color(44, 62, 80);          // Texto oscuro
     private static final Color COLOR_BORDE = new Color(189, 195, 199);       // Borde gris
     
     // Constantes de compatibilidad
@@ -71,10 +71,10 @@ public class FormularioRegistroCompleto extends JFrame {
     private static final Color COLOR_SECUNDARIO = COLOR_ACENTO;
     private static final Color COLOR_PELIGRO = new Color(231, 76, 60);      // Rojo error
     
-    private static final Font FONT_TITULO = new Font("Segoe UI", Font.BOLD, 28);
+    @SuppressWarnings("unused") private static final Font FONT_TITULO = new Font("Segoe UI", Font.BOLD, 28);
     private static final Font FONT_SUBTITULO = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Font FONT_LABEL = new Font("Segoe UI", Font.PLAIN, 12);
-    private static final Font FONT_BOTON = new Font("Segoe UI", Font.BOLD, 13);
+    @SuppressWarnings("unused") private static final Font FONT_BOTON = new Font("Segoe UI", Font.BOLD, 13);
 
     /**
      * Constructor principal
@@ -115,7 +115,7 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 🔧 Inicializar servicios
+     * Inicializar servicios
      */
     private void inicializarServicios() {
         try {
@@ -157,33 +157,39 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 📋 Crear panel de título
+     * Crear panel de título moderno centrado (igual que el login)
      */
     private void crearPanelTitulo() {
         panelTitulo = new JPanel(new BorderLayout());
         panelTitulo.setBackground(COLOR_PRIMARIO);
-        panelTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        panelTitulo.setBorder(BorderFactory.createEmptyBorder(25, 0, 25, 0));
         
+        // Contenedor para centrar el título
+        JPanel contenedorTitulo = new JPanel();
+        contenedorTitulo.setLayout(new BoxLayout(contenedorTitulo, BoxLayout.Y_AXIS));
+        contenedorTitulo.setBackground(COLOR_PRIMARIO);
+        
+        // Título principal
         JLabel lblTitulo = new JLabel("REGISTRO DE NUEVO USUARIO");
-        lblTitulo.setFont(FONT_TITULO);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitulo.setForeground(COLOR_BLANCO);
-        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         
+        // Subtítulo
         JLabel lblSubtitulo = new JLabel("Complete sus datos y capture imágenes para el reconocimiento facial");
-        lblSubtitulo.setFont(FONT_SUBTITULO);
-        lblSubtitulo.setForeground(COLOR_BLANCO);
-        lblSubtitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblSubtitulo.setForeground(new Color(189, 195, 199));
+        lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        JPanel contenedorCentral = new JPanel();
-        contenedorCentral.setBackground(COLOR_PRIMARIO);
-        contenedorCentral.setLayout(new BoxLayout(contenedorCentral, BoxLayout.Y_AXIS));
-        contenedorCentral.add(Box.createVerticalStrut(10));
-        contenedorCentral.add(lblTitulo);
-        contenedorCentral.add(Box.createVerticalStrut(5));
-        contenedorCentral.add(lblSubtitulo);
-        contenedorCentral.add(Box.createVerticalStrut(10));
+        // Agregar componentes al contenedor
+        contenedorTitulo.add(Box.createVerticalStrut(10));
+        contenedorTitulo.add(lblTitulo);
+        contenedorTitulo.add(Box.createVerticalStrut(8));
+        contenedorTitulo.add(lblSubtitulo);
+        contenedorTitulo.add(Box.createVerticalStrut(10));
         
-        panelTitulo.add(contenedorCentral, BorderLayout.CENTER);
+        // Centrar el contenedor en el panel
+        panelTitulo.add(contenedorTitulo, BorderLayout.CENTER);
     }
 
     /**
@@ -197,51 +203,45 @@ public class FormularioRegistroCompleto extends JFrame {
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
         
-        JLabel lblTituloForm = new JLabel("📝 Información Personal");
+        JLabel lblTituloForm = new JLabel("Información Personal");
         lblTituloForm.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTituloForm.setForeground(COLOR_PRIMARIO);
         
         // Campos del formulario
-        JLabel lblNombreUsuario = new JLabel("👤 Nombre de Usuario:");
+        JLabel lblNombreUsuario = new JLabel("Nombre de Usuario:");
         lblNombreUsuario.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        txtNombreUsuario = new JTextField();
-        txtNombreUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtNombreUsuario.setPreferredSize(new Dimension(200, 30));
+        txtNombreUsuario = crearCampoTextoModerno();
+        txtNombreUsuario.setToolTipText("Nombre unico para el acceso al sistema");
         
-        JLabel lblNombreCompleto = new JLabel("📋 Nombre Completo:");
+        JLabel lblNombreCompleto = new JLabel("Nombre Completo:");
         lblNombreCompleto.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        txtNombreCompleto = new JTextField();
-        txtNombreCompleto.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtNombreCompleto.setPreferredSize(new Dimension(200, 30));
+        txtNombreCompleto = crearCampoTextoModerno();
+        txtNombreCompleto.setToolTipText("Su nombre completo real");
         
-        JLabel lblCorreo = new JLabel("📧 Correo Electrónico:");
+        JLabel lblCorreo = new JLabel("Correo Electronico:");
         lblCorreo.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        txtCorreo = new JTextField();
-        txtCorreo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtCorreo.setPreferredSize(new Dimension(200, 30));
+        txtCorreo = crearCampoTextoModerno();
+        txtCorreo.setToolTipText("Correo electronico valido para notificaciones");
         
-        JLabel lblTelefono = new JLabel("📱 Teléfono:");
+        JLabel lblTelefono = new JLabel("Telefono:");
         lblTelefono.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        txtTelefono = new JTextField();
-        txtTelefono.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtTelefono.setPreferredSize(new Dimension(200, 30));
+        txtTelefono = crearCampoTextoModerno();
+        txtTelefono.setToolTipText("Numero de telefono de contacto");
         
-        JLabel lblContrasena = new JLabel("🔑 Contraseña:");
+        JLabel lblContrasena = new JLabel("Contrasena:");
         lblContrasena.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        txtContrasena = new JPasswordField();
-        txtContrasena.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtContrasena.setPreferredSize(new Dimension(200, 30));
+        txtContrasena = crearCampoPasswordModerno();
+        txtContrasena.setToolTipText("Contrasena segura (minimo 6 caracteres)");
         
-        JLabel lblConfirmar = new JLabel("🔐 Confirmar Contraseña:");
+        JLabel lblConfirmar = new JLabel("Confirmar Contrasena:");
         lblConfirmar.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        txtConfirmarContrasena = new JPasswordField();
-        txtConfirmarContrasena.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtConfirmarContrasena.setPreferredSize(new Dimension(200, 30));
+        txtConfirmarContrasena = crearCampoPasswordModerno();
+        txtConfirmarContrasena.setToolTipText("Repita la contrasena para confirmar");
         
         // Layout del formulario
         panelFormulario.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(8, 10, 8, 10); // Espaciado más generoso
         
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
         panelFormulario.add(lblTituloForm, gbc);
@@ -267,7 +267,7 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 📷 Crear panel de captura facial
+     * Crear panel de captura facial
      */
     private void crearPanelCaptura() {
         panelCaptura = new JPanel(new BorderLayout());
@@ -305,24 +305,16 @@ public class FormularioRegistroCompleto extends JFrame {
         JPanel panelBotonesCamara = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         panelBotonesCamara.setBackground(COLOR_FONDO);
         
-        btnActivarCamara = new JButton("ACTIVAR CÁMARA");
-        btnActivarCamara.setFont(FONT_BOTON);
-        btnActivarCamara.setBackground(COLOR_ACENTO);
-        btnActivarCamara.setForeground(Color.BLACK);
-        btnActivarCamara.setPreferredSize(new Dimension(150, 35));
-        btnActivarCamara.setFocusPainted(false);
-        btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        btnActivarCamara.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Activar Cámara moderno
+        btnActivarCamara = crearBotonModerno("ACTIVAR CÁMARA", 
+            new Color(187, 222, 251), new Color(144, 202, 249));
+        btnActivarCamara.setPreferredSize(new Dimension(170, 40));
         
-        btnCapturarMuestra = new JButton("CAPTURAR MUESTRA");
-        btnCapturarMuestra.setFont(FONT_BOTON);
-        btnCapturarMuestra.setBackground(COLOR_ACENTO);
-        btnCapturarMuestra.setForeground(Color.BLACK);
-        btnCapturarMuestra.setPreferredSize(new Dimension(170, 35));
-        btnCapturarMuestra.setFocusPainted(false);
+        // Botón Capturar Muestra moderno
+        btnCapturarMuestra = crearBotonModerno("CAPTURAR MUESTRA", 
+            new Color(200, 230, 201), new Color(165, 214, 167));
+        btnCapturarMuestra.setPreferredSize(new Dimension(190, 40));
         btnCapturarMuestra.setEnabled(false);
-        btnCapturarMuestra.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        btnCapturarMuestra.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         panelBotonesCamara.add(btnActivarCamara);
         panelBotonesCamara.add(btnCapturarMuestra);
@@ -364,37 +356,25 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * Crear panel de botones
+     * Crear panel de botones modernos
      */
     private void crearPanelBotones() {
-        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         panelBotones.setBackground(COLOR_FONDO);
-        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(25, 0, 35, 0));
         
-        btnRegistrar = new JButton("REGISTRAR USUARIO");
-        btnRegistrar.setFont(FONT_BOTON);
-        btnRegistrar.setBackground(COLOR_ACENTO); // Azul como botón principal
-        btnRegistrar.setForeground(Color.BLACK);
-        btnRegistrar.setFocusPainted(false);
-        btnRegistrar.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btnRegistrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Registrar Usuario - Verde claro moderno
+        btnRegistrar = crearBotonModerno("REGISTRAR USUARIO", 
+            new Color(200, 230, 201), new Color(165, 214, 167));
         btnRegistrar.setEnabled(false);
         
-        btnCancelar = new JButton("Cancelar");
-        btnCancelar.setFont(FONT_BOTON);
-        btnCancelar.setBackground(new Color(231, 76, 60)); // Rojo profesional igual al login
-        btnCancelar.setForeground(Color.BLACK);
-        btnCancelar.setFocusPainted(false);
-        btnCancelar.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Cancelar - Rosa claro moderno
+        btnCancelar = crearBotonModerno("Cancelar", 
+            new Color(255, 205, 210), new Color(255, 171, 145));
         
-        btnVolverLogin = new JButton("Volver al Login");
-        btnVolverLogin.setFont(FONT_BOTON);
-        btnVolverLogin.setBackground(new Color(149, 165, 166)); // Gris profesional igual al login
-        btnVolverLogin.setForeground(Color.BLACK);
-        btnVolverLogin.setFocusPainted(false);
-        btnVolverLogin.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        btnVolverLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Botón Volver al Login - Azul claro moderno
+        btnVolverLogin = crearBotonModerno("Volver al Login", 
+            new Color(187, 222, 251), new Color(144, 202, 249));
         
         panelBotones.add(btnRegistrar);
         panelBotones.add(btnCancelar);
@@ -414,16 +394,14 @@ public class FormularioRegistroCompleto extends JFrame {
         panelCentral.add(panelFormulario);
         panelCentral.add(panelCaptura);
         
-        add(panelTitulo, BorderLayout.NORTH);
-        add(panelCentral, BorderLayout.CENTER);
-        add(lblEstado, BorderLayout.SOUTH);
-        
-        // Panel de botones en el sur
+        // Panel de estado y botones en el sur
         JPanel panelSur = new JPanel(new BorderLayout());
         panelSur.setBackground(COLOR_FONDO);
         panelSur.add(lblEstado, BorderLayout.CENTER);
         panelSur.add(panelBotones, BorderLayout.SOUTH);
         
+        add(panelTitulo, BorderLayout.NORTH);
+        add(panelCentral, BorderLayout.CENTER);
         add(panelSur, BorderLayout.SOUTH);
     }
 
@@ -539,7 +517,7 @@ public class FormularioRegistroCompleto extends JFrame {
                             btnActivarCamara.setText("CÁMARA ACTIVA");
                             btnActivarCamara.setEnabled(false);
                             btnCapturarMuestra.setEnabled(true);
-                            lblCamara.setText("🎥 TRANSMITIENDO");
+                            lblCamara.setText("TRANSMITIENDO");
                             lblCamara.setBackground(COLOR_SECUNDARIO);
                             actualizarEstado("Cámara activa - Listo para captura");
                             iniciarStreamVideo(); // Iniciar stream de video
@@ -613,13 +591,13 @@ public class FormularioRegistroCompleto extends JFrame {
         
         if (capturas >= MUESTRAS_REQUERIDAS) {
             progressCaptura.setForeground(COLOR_SECUNDARIO);
-            lblMuestrasCapturadas.setText("✅ Capturas completadas correctamente");
+            lblMuestrasCapturadas.setText(">> Capturas completadas correctamente");
             lblMuestrasCapturadas.setForeground(COLOR_SECUNDARIO);
         }
     }
 
     /**
-     * ✅ Registrar usuario
+     * Registrar usuario
      */
     private void registrarUsuario() {
         if (!validarDatos()) {
@@ -764,7 +742,8 @@ public class FormularioRegistroCompleto extends JFrame {
         
         if (formValido) {
             btnRegistrar.setBackground(COLOR_SECUNDARIO);
-            actualizarEstado("✅ Listo para registrar - Haga clic en REGISTRAR USUARIO");
+            btnRegistrar.setForeground(Color.BLACK); // Asegurar texto negro
+            actualizarEstado(">> Listo para registrar - Haga clic en REGISTRAR USUARIO");
         }
     }
 
@@ -814,7 +793,7 @@ public class FormularioRegistroCompleto extends JFrame {
         btnRegistrar.setEnabled(false);
         
         if (camaraActiva) {
-            btnActivarCamara.setText("📹 ACTIVAR CÁMARA");
+            btnActivarCamara.setText("ACTIVAR CÁMARA");
             btnActivarCamara.setEnabled(true);
             camaraActiva = false;
         }
@@ -834,7 +813,7 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * ✅ Mostrar mensaje de éxito
+     * Mostrar mensaje de exito
      */
     private void mostrarExito(String mensaje) {
         actualizarEstado(mensaje);
@@ -907,7 +886,7 @@ public class FormularioRegistroCompleto extends JFrame {
     }
     
     /**
-     * 🛑 Detener stream de video
+     * Detener stream de video
      */
     private void detenerStreamVideo() {
         if (videoTimer != null) {
@@ -920,7 +899,127 @@ public class FormularioRegistroCompleto extends JFrame {
         lblCamara.setText("CÁMARA DETENIDA");
         lblCamara.setBackground(new Color(245, 245, 245));
         
-        System.out.println("🛑 Stream de video detenido");
+        System.out.println(">> Stream de video detenido");
+    }
+
+    /**
+     * Crear campo de texto moderno con efectos
+     */
+    private JTextField crearCampoTextoModerno() {
+        JTextField campo = new JTextField();
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        campo.setPreferredSize(new Dimension(250, 35));
+        
+        // Borde inicial
+        Color bordeNormal = new Color(200, 200, 200);
+        Color bordeFocus = new Color(100, 149, 237);
+        
+        campo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(bordeNormal, 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        
+        // Efectos de focus
+        campo.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(bordeFocus, 2),
+                    BorderFactory.createEmptyBorder(4, 9, 4, 9)
+                ));
+            }
+            
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(bordeNormal, 1),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                ));
+            }
+        });
+        
+        return campo;
+    }
+
+    /**
+     * Crear campo de contraseña moderno con efectos
+     */
+    private JPasswordField crearCampoPasswordModerno() {
+        JPasswordField campo = new JPasswordField();
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        campo.setPreferredSize(new Dimension(250, 35));
+        
+        // Borde inicial
+        Color bordeNormal = new Color(200, 200, 200);
+        Color bordeFocus = new Color(100, 149, 237);
+        
+        campo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(bordeNormal, 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        
+        // Efectos de focus
+        campo.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(bordeFocus, 2),
+                    BorderFactory.createEmptyBorder(4, 9, 4, 9)
+                ));
+            }
+            
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(bordeNormal, 1),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                ));
+            }
+        });
+        
+        return campo;
+    }
+
+    /**
+     * Crear botón moderno con efectos hover
+     */
+    private JButton crearBotonModerno(String texto, Color colorNormal, Color colorHover) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setBackground(colorNormal);
+        boton.setForeground(Color.BLACK); // Texto negro siempre
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boton.setPreferredSize(new Dimension(160, 40));
+        
+        // Bordes redondeados simulados con padding
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(colorNormal, 1),
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        
+        // Efectos hover modernos
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(colorHover);
+                boton.setForeground(Color.BLACK); // Texto negro siempre
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorHover, 2),
+                    BorderFactory.createEmptyBorder(9, 19, 9, 19)
+                ));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(colorNormal);
+                boton.setForeground(Color.BLACK); // Texto negro siempre
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(colorNormal, 1),
+                    BorderFactory.createEmptyBorder(10, 20, 10, 20)
+                ));
+            }
+        });
+        
+        return boton;
     }
 
     /**

@@ -21,7 +21,8 @@ public class ManejadorImagenes {
     // Configuraciones por defecto
     private static final int DIMENSION_PREDETERMINADA = 64;
     private static final String FORMATO_PREDETERMINADO = "jpg";
-    private static final float CALIDAD_JPEG = 0.85f;
+    // Calidad JPEG removida por no uso - se puede restaurar si se necesita
+    // private static final float CALIDAD_JPEG = 0.85f;
 
     /**
      * Redimensiona una imagen manteniendo la proporción
