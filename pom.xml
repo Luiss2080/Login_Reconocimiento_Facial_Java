@@ -46,6 +46,13 @@
             <version>${opencv.version}</version>
         </dependency>
 
+        <!-- OpenBLAS para operaciones matemáticas optimizadas -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>openblas-platform</artifactId>
+            <version>0.3.23-1.5.9</version>
+        </dependency>
+
         <!-- ========== BASE DE DATOS ========== -->
 
         <!-- MySQL Connector -->

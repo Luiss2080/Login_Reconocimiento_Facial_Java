@@ -2,6 +2,7 @@ package com.reconocimiento.facial;
 
 import com.reconocimiento.facial.controladores.ControladorPrincipal;
 import com.reconocimiento.facial.basedatos.ConexionBaseDatos;
+import com.reconocimiento.facial.configuracion.ConfiguradorOpenCV;
 
 import javax.swing.*;
 import java.awt.*;
@@ -189,6 +190,17 @@ public class AplicacionPrincipal {
         System.out.println("Inicializando sistema...");
 
         try {
+            // Inicializar OpenCV primero (crítico para funcionalidad de cámara)
+            System.out.println("🔧 Inicializando OpenCV...");
+            if (!ConfiguradorOpenCV.inicializarOpenCV()) {
+                System.err.println("❌ ERROR CRÍTICO: No se pudo inicializar OpenCV");
+                System.err.println("   Motivo: " + ConfiguradorOpenCV.getUltimoError());
+                return false;
+            }
+            
+            // Mostrar diagnóstico de OpenCV
+            ConfiguradorOpenCV.mostrarDiagnostico();
+            
             // Verificar conexión a la base de datos
             if (!verificarConexionBaseDatos()) {
                 System.err.println("No se pudo establecer conexión con la base de datos");
@@ -201,7 +213,7 @@ public class AplicacionPrincipal {
             // Verificar disponibilidad de cámara
             verificarDisponibilidadCamara();
 
-            System.out.println("Sistema inicializado correctamente");
+            System.out.println("✅ Sistema inicializado correctamente con OpenCV integrado");
             return true;
 
         } catch (Exception e) {

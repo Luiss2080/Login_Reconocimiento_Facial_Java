@@ -6,6 +6,9 @@ import com.reconocimiento.facial.modelos.Usuario;
 import com.reconocimiento.facial.modelos.IntentoAcceso;
 import com.reconocimiento.facial.seguridad.CifradorContrasenas;
 import com.reconocimiento.facial.neural.RedNeuronalReconocimiento;
+import com.reconocimiento.facial.procesamiento.IntegradorOpenCV;
+import com.reconocimiento.facial.procesamiento.IntegradorOpenCV.ResultadoAutenticacionFacial;
+import com.reconocimiento.facial.procesamiento.IntegradorOpenCV.InformacionDeteccionRostros;
 
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
@@ -23,6 +26,7 @@ public class ServicioUsuarioMejorado {
     private final UsuarioDAO usuarioDAO;
     private final CifradorContrasenas cifradorContrasenas;
     private final RedNeuronalReconocimiento redNeuronal;
+    private final IntegradorOpenCV integradorOpenCV;
     
     // ========== CONFIGURACIONES DE SEGURIDAD ==========
     private static final int MAX_INTENTOS_FALLIDOS = 5;
@@ -37,8 +41,11 @@ public class ServicioUsuarioMejorado {
             this.usuarioDAO = new UsuarioDAO();
             this.cifradorContrasenas = new CifradorContrasenas();
             this.redNeuronal = new RedNeuronalReconocimiento();
+            this.integradorOpenCV = new IntegradorOpenCV();
             
             System.out.println("✅ ServicioUsuario inicializado correctamente");
+            System.out.println("🔧 IntegradorOpenCV estado: " + 
+                             (integradorOpenCV.isSistemaInicializado() ? "✅ Activo" : "❌ Inactivo"));
             
         } catch (Exception e) {
             System.err.println("❌ Error inicializando ServicioUsuario: " + e.getMessage());
@@ -110,11 +117,11 @@ public class ServicioUsuarioMejorado {
     }
 
     /**
-     * 📷 Autenticación con reconocimiento facial
+     * 📷 Autenticación con reconocimiento facial INTEGRADO CON OPENCV
      */
     public Optional<Usuario> autenticarConReconocimientoFacial(BufferedImage imagenRostro) {
         try {
-            System.out.println("📷 Iniciando autenticación por reconocimiento facial");
+            System.out.println("📷 Iniciando autenticación por reconocimiento facial con OpenCV");
             
             if (imagenRostro == null) {
                 System.err.println("❌ Imagen de rostro es null");
@@ -122,32 +129,70 @@ public class ServicioUsuarioMejorado {
                 return Optional.empty();
             }
             
-            // Usar la red neuronal para reconocer el usuario
-            Optional<Usuario> usuarioReconocido = redNeuronal.reconocerUsuario(imagenRostro);
+            // Intentar reconocimiento con OpenCV primero (algoritmos avanzados)
+            Optional<Usuario> usuarioReconocido = Optional.empty();
+            double confianzaFinal = 0.0;
+            String metodoUsado = "";
             
+            if (integradorOpenCV.isSistemaInicializado()) {
+                System.out.println("🔧 Intentando reconocimiento con OpenCV...");
+                
+                ResultadoAutenticacionFacial resultadoOpenCV = integradorOpenCV.autenticarUsuarioFacial(imagenRostro);
+                
+                if (resultadoOpenCV.isAutenticado()) {
+                    // Buscar usuario en base de datos
+                    usuarioReconocido = usuarioDAO.buscarPorNombreUsuario(resultadoOpenCV.getNombreUsuario());
+                    confianzaFinal = resultadoOpenCV.getConfianza() / 100.0; // Convertir a decimal
+                    metodoUsado = "OpenCV (" + String.format("%.2f%%", resultadoOpenCV.getConfianza()) + ")";
+                    
+                    System.out.println("✅ Reconocimiento OpenCV exitoso: " + resultadoOpenCV.getNombreUsuario() + 
+                                     " - " + resultadoOpenCV.getMensaje());
+                }
+            }
+            
+            // Si OpenCV no funcionó, intentar con Red Neuronal (backup)
+            if (!usuarioReconocido.isPresent()) {
+                System.out.println("🧠 Intentando reconocimiento con Red Neuronal...");
+                
+                usuarioReconocido = redNeuronal.reconocerUsuario(imagenRostro);
+                
+                if (usuarioReconocido.isPresent()) {
+                    confianzaFinal = redNeuronal.getUltimaConfianza();
+                    metodoUsado = "Red Neuronal (" + String.format("%.2f%%", confianzaFinal * 100) + ")";
+                    
+                    System.out.println("✅ Reconocimiento Red Neuronal exitoso: " + usuarioReconocido.get().getNombreUsuario());
+                }
+            }
+            
+            // Procesar resultado
             if (usuarioReconocido.isPresent()) {
                 Usuario usuario = usuarioReconocido.get();
-                double confianza = redNeuronal.getUltimaConfianza();
                 
-                System.out.println("✅ Reconocimiento facial exitoso: " + usuario.getNombreUsuario() + 
-                                 " (Confianza: " + String.format("%.2f%%", confianza * 100) + ")");
+                System.out.println("🎯 Autenticación facial EXITOSA:");
+                System.out.println("   👤 Usuario: " + usuario.getNombreUsuario());
+                System.out.println("   🔧 Método: " + metodoUsado);
+                System.out.println("   📊 Confianza: " + String.format("%.2f%%", confianzaFinal * 100));
                 
                 // Actualizar último acceso
                 usuario.registrarAcceso();
                 
-                // Registrar acceso exitoso
-                registrarAccesoExitoso(usuario, IntentoAcceso.TipoAcceso.FACIAL, confianza);
+                // Registrar acceso exitoso con información del método
+                registrarAccesoExitoso(usuario, IntentoAcceso.TipoAcceso.FACIAL, confianzaFinal);
                 
                 return Optional.of(usuario);
                 
             } else {
-                System.out.println("❌ Rostro no reconocido o confianza insuficiente");
-                registrarIntentoFallido(null, IntentoAcceso.TipoAcceso.FACIAL, "Rostro no reconocido");
+                System.out.println("❌ Rostro no reconocido por ningún método");
+                System.out.println("   🔧 OpenCV: " + (integradorOpenCV.isSistemaInicializado() ? "Intentado" : "No disponible"));
+                System.out.println("   🧠 Red Neuronal: Intentado");
+                
+                registrarIntentoFallido(null, IntentoAcceso.TipoAcceso.FACIAL, "Rostro no reconocido por ningún algoritmo");
                 return Optional.empty();
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Error en autenticación facial: " + e.getMessage());
+            System.err.println("❌ Error en autenticación facial integrada: " + e.getMessage());
+            e.printStackTrace();
             registrarIntentoFallido(null, IntentoAcceso.TipoAcceso.FACIAL, "Error del sistema: " + e.getMessage());
             return Optional.empty();
         }
@@ -199,15 +244,38 @@ public class ServicioUsuarioMejorado {
                 return false;
             }
             
-            // Registrar características faciales en la red neuronal
-            boolean registroFacialExitoso = redNeuronal.registrarUsuario(
+            // Registrar características faciales con OpenCV integrado
+            boolean registroOpenCVExitoso = false;
+            boolean registroRedNeuronalExitoso = false;
+            
+            // 1. Registro con IntegradorOpenCV (Algoritmos avanzados)
+            if (integradorOpenCV.isSistemaInicializado()) {
+                registroOpenCVExitoso = integradorOpenCV.registrarUsuarioFacial(
+                    usuarioDTO.getNombreUsuario(), 
+                    muestrasFaciales
+                );
+                System.out.println("🔧 Registro OpenCV: " + (registroOpenCVExitoso ? "✅ Exitoso" : "❌ Falló"));
+            }
+            
+            // 2. Registro con RedNeuronal (Backup y compatibilidad)
+            registroRedNeuronalExitoso = redNeuronal.registrarUsuario(
                 usuarioDTO.getNombreUsuario(), 
                 muestrasFaciales
             );
+            System.out.println("🧠 Registro Red Neuronal: " + (registroRedNeuronalExitoso ? "✅ Exitoso" : "❌ Falló"));
             
-            if (!registroFacialExitoso) {
-                System.err.println("⚠️ Error registrando características faciales, pero usuario creado");
-                // Nota: El usuario puede usar solo login por credenciales
+            // Evaluación del resultado
+            if (registroOpenCVExitoso || registroRedNeuronalExitoso) {
+                System.out.println("✅ Usuario registrado exitosamente con reconocimiento facial");
+                if (registroOpenCVExitoso && registroRedNeuronalExitoso) {
+                    System.out.println("🚀 Doble algoritmo activo: OpenCV + Red Neuronal");
+                } else if (registroOpenCVExitoso) {
+                    System.out.println("🔧 Reconocimiento por OpenCV activo");
+                } else {
+                    System.out.println("🧠 Reconocimiento por Red Neuronal activo");
+                }
+            } else {
+                System.err.println("⚠️ Error en registro facial, pero usuario creado para login por credenciales");
             }
             
             System.out.println("✅ Usuario registrado exitosamente: " + usuarioDTO.getNombreUsuario());

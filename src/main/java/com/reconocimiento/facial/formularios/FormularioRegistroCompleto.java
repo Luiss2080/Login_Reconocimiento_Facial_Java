@@ -33,13 +33,15 @@ public class FormularioRegistroCompleto extends JFrame {
     private JPasswordField txtContrasena;
     private JPasswordField txtConfirmarContrasena;
     
-    // Componentes de captura facial
+    // Componentes de captura facial - MEJORADOS
     private JLabel lblCamara;
+    private JLabel lblVistaPrevia; // Nueva: Para mostrar video en tiempo real HD
     private JButton btnActivarCamara;
     private JButton btnCapturarMuestra;
     private JProgressBar progressCaptura;
     private JLabel lblMuestrasCapturadas;
     private JLabel lblEstado;
+    private JPanel panelVideoContainer; // Contenedor del video mejorado
     
     // Botones principales
     private JButton btnRegistrar;
@@ -241,29 +243,42 @@ public class FormularioRegistroCompleto extends JFrame {
         // Layout del formulario
         panelFormulario.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 10, 8, 10); // Espaciado más generoso
         
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(0, 0, 20, 0);
         panelFormulario.add(lblTituloForm, gbc);
         
-        gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.WEST;
+        // Configuración para labels: más a la izquierda con menos ancho
+        gbc.gridwidth = 1; 
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 0.0; // No expandir los labels
+        gbc.insets = new Insets(8, 10, 8, 5); // Menos margen izquierdo para labels
+        
+        // Configuración para campos: más anchos
+        GridBagConstraints gbcCampos = new GridBagConstraints();
+        gbcCampos.gridwidth = 1;
+        gbcCampos.anchor = GridBagConstraints.WEST;
+        gbcCampos.weightx = 1.0; // Expandir los campos
+        gbcCampos.fill = GridBagConstraints.HORIZONTAL;
+        gbcCampos.insets = new Insets(8, 5, 8, 20); // Más margen derecho para campos
+        
         gbc.gridx = 0; gbc.gridy = 1; panelFormulario.add(lblNombreUsuario, gbc);
-        gbc.gridx = 1; gbc.gridy = 1; panelFormulario.add(txtNombreUsuario, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 1; panelFormulario.add(txtNombreUsuario, gbcCampos);
         
         gbc.gridx = 0; gbc.gridy = 2; panelFormulario.add(lblNombreCompleto, gbc);
-        gbc.gridx = 1; gbc.gridy = 2; panelFormulario.add(txtNombreCompleto, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 2; panelFormulario.add(txtNombreCompleto, gbcCampos);
         
         gbc.gridx = 0; gbc.gridy = 3; panelFormulario.add(lblCorreo, gbc);
-        gbc.gridx = 1; gbc.gridy = 3; panelFormulario.add(txtCorreo, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 3; panelFormulario.add(txtCorreo, gbcCampos);
         
         gbc.gridx = 0; gbc.gridy = 4; panelFormulario.add(lblTelefono, gbc);
-        gbc.gridx = 1; gbc.gridy = 4; panelFormulario.add(txtTelefono, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 4; panelFormulario.add(txtTelefono, gbcCampos);
         
         gbc.gridx = 0; gbc.gridy = 5; panelFormulario.add(lblContrasena, gbc);
-        gbc.gridx = 1; gbc.gridy = 5; panelFormulario.add(txtContrasena, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 5; panelFormulario.add(txtContrasena, gbcCampos);
         
         gbc.gridx = 0; gbc.gridy = 6; panelFormulario.add(lblConfirmar, gbc);
-        gbc.gridx = 1; gbc.gridy = 6; panelFormulario.add(txtConfirmarContrasena, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 6; panelFormulario.add(txtConfirmarContrasena, gbcCampos);
     }
 
     /**
@@ -283,38 +298,69 @@ public class FormularioRegistroCompleto extends JFrame {
         lblTituloCaptura.setForeground(COLOR_PRINCIPAL);
         lblTituloCaptura.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Panel para la cámara con mejor diseño
+        // Panel para la cámara MEJORADO - Estilo Premium HD
         JPanel panelCamara = new JPanel(new BorderLayout());
         panelCamara.setBackground(COLOR_FONDO);
         panelCamara.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         
-        lblCamara = new JLabel("CÁMARA INACTIVA");
-        lblCamara.setFont(FONT_LABEL);
-        lblCamara.setHorizontalAlignment(SwingConstants.CENTER);
-        lblCamara.setVerticalAlignment(SwingConstants.CENTER);
-        lblCamara.setPreferredSize(new Dimension(250, 180));
-        lblCamara.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDE, 2),
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        ));
-        lblCamara.setOpaque(true);
-        lblCamara.setBackground(new Color(245, 245, 245));
-        lblCamara.setForeground(new Color(120, 120, 120));
+        // Crear contenedor de video moderno
+        crearContenedorVideoModerno(panelCamara);
         
         // Panel de botones de cámara
         JPanel panelBotonesCamara = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         panelBotonesCamara.setBackground(COLOR_FONDO);
         
-        // Botón Activar Cámara moderno
-        btnActivarCamara = crearBotonModerno("ACTIVAR CÁMARA", 
-            new Color(187, 222, 251), new Color(144, 202, 249));
-        btnActivarCamara.setPreferredSize(new Dimension(170, 40));
+        // Botón Activar Cámara PREMIUM - Estilo Login
+        btnActivarCamara = new JButton("ACTIVAR CAMARA");
+        btnActivarCamara.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnActivarCamara.setBackground(new Color(187, 222, 251)); // Azul muy claro
+        btnActivarCamara.setForeground(Color.BLACK);
+        btnActivarCamara.setPreferredSize(new Dimension(200, 45));
+        btnActivarCamara.setMaximumSize(new Dimension(200, 45));
+        btnActivarCamara.setFocusPainted(false);
+        btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnActivarCamara.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Botón Capturar Muestra moderno
-        btnCapturarMuestra = crearBotonModerno("CAPTURAR MUESTRA", 
-            new Color(200, 230, 201), new Color(165, 214, 167));
-        btnCapturarMuestra.setPreferredSize(new Dimension(190, 40));
+        // Efectos hover premium para cámara
+        btnActivarCamara.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (btnActivarCamara.isEnabled()) {
+                    btnActivarCamara.setBackground(new Color(144, 202, 249));
+                    btnActivarCamara.setForeground(Color.BLACK);
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (btnActivarCamara.isEnabled() && !btnActivarCamara.getText().contains("ACTIVA")) {
+                    btnActivarCamara.setBackground(new Color(187, 222, 251));
+                    btnActivarCamara.setForeground(Color.BLACK);
+                }
+            }
+        });
+        
+        // Botón Capturar Muestra PREMIUM
+        btnCapturarMuestra = new JButton("CAPTURAR MUESTRA");
+        btnCapturarMuestra.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnCapturarMuestra.setBackground(new Color(200, 230, 201)); // Verde claro
+        btnCapturarMuestra.setForeground(Color.BLACK);
+        btnCapturarMuestra.setPreferredSize(new Dimension(170, 45));
+        btnCapturarMuestra.setFocusPainted(false);
+        btnCapturarMuestra.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnCapturarMuestra.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCapturarMuestra.setEnabled(false);
+        
+        // Efectos hover premium para captura
+        btnCapturarMuestra.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (btnCapturarMuestra.isEnabled()) {
+                    btnCapturarMuestra.setBackground(new Color(165, 214, 167));
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (btnCapturarMuestra.isEnabled()) {
+                    btnCapturarMuestra.setBackground(new Color(200, 230, 201));
+                }
+            }
+        });
         
         panelBotonesCamara.add(btnActivarCamara);
         panelBotonesCamara.add(btnCapturarMuestra);
@@ -336,8 +382,8 @@ public class FormularioRegistroCompleto extends JFrame {
         lblMuestrasCapturadas.setForeground(new Color(100, 100, 100));
         lblMuestrasCapturadas.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Ensamblar el panel
-        panelCamara.add(lblCamara, BorderLayout.CENTER);
+        // El contenedor de video ya se agregó en crearContenedorVideoModerno()
+        // No agregamos lblCamara porque usamos el nuevo panelVideoContainer
         
         JPanel panelInfo = new JPanel(new BorderLayout());
         panelInfo.setBackground(COLOR_FONDO);
@@ -363,10 +409,17 @@ public class FormularioRegistroCompleto extends JFrame {
         panelBotones.setBackground(COLOR_FONDO);
         panelBotones.setBorder(BorderFactory.createEmptyBorder(25, 0, 35, 0));
         
-        // Botón Registrar Usuario - Verde claro moderno
-        btnRegistrar = crearBotonModerno("REGISTRAR USUARIO", 
-            new Color(200, 230, 201), new Color(165, 214, 167));
+        // Botón Registrar Usuario - Verde claro moderno con mejor contraste
+        btnRegistrar = crearBotonModerno("Registrar", 
+            new Color(220, 245, 220), new Color(200, 230, 200));
         btnRegistrar.setEnabled(false);
+        // Forzar texto negro siempre
+        btnRegistrar.setForeground(Color.BLACK);
+        
+        // Listener para mantener el color negro al habilitar
+        btnRegistrar.addPropertyChangeListener("enabled", evt -> {
+            btnRegistrar.setForeground(Color.BLACK);
+        });
         
         // Botón Cancelar - Rosa claro moderno
         btnCancelar = crearBotonModerno("Cancelar", 
@@ -463,6 +516,120 @@ public class FormularioRegistroCompleto extends JFrame {
     }
     
     /**
+     * Crear contenedor de video moderno estilo premium
+     */
+    private void crearContenedorVideoModerno(JPanel panelPadre) {
+        // Crear contenedor principal de video - MAS GRANDE Y VISIBLE
+        panelVideoContainer = new JPanel(new BorderLayout());
+        panelVideoContainer.setBackground(new Color(44, 62, 80));
+        panelVideoContainer.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(52, 73, 94), 2),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        // Tamaño más grande y fijo
+        panelVideoContainer.setPreferredSize(new Dimension(350, 250));
+        panelVideoContainer.setMinimumSize(new Dimension(350, 250));
+        panelVideoContainer.setMaximumSize(new Dimension(350, 250));
+        
+        // Vista previa de video mejorada
+        lblVistaPrevia = new JLabel();
+        lblVistaPrevia.setHorizontalAlignment(SwingConstants.CENTER);
+        lblVistaPrevia.setVerticalAlignment(SwingConstants.CENTER);
+        lblVistaPrevia.setOpaque(true);
+        lblVistaPrevia.setBackground(new Color(44, 62, 80));
+        lblVistaPrevia.setForeground(Color.WHITE);
+        lblVistaPrevia.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        
+        // Estado inicial MAS VISIBLE con texto más claro
+        mostrarEstadoCamaraModerno("<html><center><b>Camara Desconectada</b><br><br>Presione 'ACTIVAR CAMARA' para conectar</center></html>", new Color(231, 76, 60));
+        
+        panelVideoContainer.add(lblVistaPrevia, BorderLayout.CENTER);
+        
+        // Agregar al panel padre con posición específica
+        panelPadre.add(panelVideoContainer, BorderLayout.CENTER);
+        
+        // Forzar repaint
+        panelVideoContainer.revalidate();
+        panelVideoContainer.repaint();
+        
+        // Inicializar timer para actualización de video HD
+        inicializarTimerVideoHD();
+        
+        // Crear label de estado (compatible con código existente) - INVISIBLE
+        lblCamara = new JLabel();
+        lblCamara.setVisible(false);
+        
+        System.out.println("DEBUG: Contenedor de video creado con tamaño " + panelVideoContainer.getPreferredSize());
+    }
+    
+    /**
+     * Mostrar estado de la cámara con estilo visual premium
+     */
+    private void mostrarEstadoCamaraModerno(String mensaje, Color color) {
+        System.out.println("DEBUG REGISTRO: Actualizando area camara - Mensaje: '" + mensaje + "' - Color: " + color);
+        
+        // Si el mensaje ya contiene HTML, usarlo tal como está
+        if (mensaje.startsWith("<html>")) {
+            lblVistaPrevia.setText(mensaje);
+        } else {
+            lblVistaPrevia.setText("<html><center>" + mensaje + "</center></html>");
+        }
+        lblVistaPrevia.setBackground(color);
+        lblVistaPrevia.setIcon(null);
+        
+        // Forzar actualización visual
+        lblVistaPrevia.revalidate();
+        lblVistaPrevia.repaint();
+        
+        System.out.println("DEBUG REGISTRO: Area camara actualizada correctamente");
+    }
+    
+    /**
+     * ⚡ Inicializar timer para actualización de video HD
+     */
+    private void inicializarTimerVideoHD() {
+        videoTimer = new Timer(33, e -> { // ~30 FPS para fluidez premium
+            if (camaraActiva && manejadorCamara != null) {
+                try {
+                    BufferedImage frame = manejadorCamara.capturarImagenBuffered();
+                    if (frame != null) {
+                        // Redimensionar imagen para contenedor HD (mejorado)
+                        Image imagenEscalada = frame.getScaledInstance(390, 290, Image.SCALE_SMOOTH);
+                        ImageIcon icono = new ImageIcon(imagenEscalada);
+                        
+                        SwingUtilities.invokeLater(() -> {
+                            lblVistaPrevia.setIcon(icono);
+                            lblVistaPrevia.setText("");
+                        });
+                    }
+                } catch (Exception ex) {
+                    // Si hay error, mantener el estado pero no actualizar frame
+                }
+            }
+        });
+    }
+    
+    /**
+     * Iniciar stream de video premium
+     */
+    private void iniciarStreamVideoHD() {
+        if (videoTimer != null && !videoTimer.isRunning()) {
+            videoTimer.start();
+            mostrarEstadoCamaraModerno("Transmision Activa", new Color(46, 204, 113));
+        }
+    }
+    
+    /**
+     * Detener stream de video  
+     */
+    private void detenerStreamVideoHD() {
+        if (videoTimer != null && videoTimer.isRunning()) {
+            videoTimer.stop();
+        }
+        mostrarEstadoCamaraModerno("Camara Desconectada", new Color(231, 76, 60));
+    }
+
+    /**
      * 🧹 Limpiar recursos antes de cerrar
      */
     private void limpiarRecursos() {
@@ -496,41 +663,119 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * Activar cámara
+     * Activar cámara con estilo premium y diagnóstico completo
      */
     private void activarCamara() {
         if (!camaraActiva) {
-            actualizarEstado("Activando cámara...");
+            System.out.println("REGISTRO: Iniciando activación de cámara...");
             
-            SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+            // Cambiar estilo del botón durante la carga
+            btnActivarCamara.setText("CONECTANDO...");
+            btnActivarCamara.setBackground(new Color(243, 156, 18)); // Naranja de carga
+            btnActivarCamara.setEnabled(false);
+            
+            actualizarEstado("Activando cámara - Puede tomar unos segundos...");
+            
+            SwingWorker<Boolean, String> worker = new SwingWorker<Boolean, String>() {
                 @Override
                 protected Boolean doInBackground() throws Exception {
-                    return manejadorCamara.inicializarCamara();
+                    // Mostrar mensajes de progreso dinámicos EXACTAMENTE como el login
+                    String[] mensajes = {
+                        "Buscando dispositivos de cámara...",
+                        "Inicializando controladores...", 
+                        "Configurando resolución...",
+                        "Optimizando rendimiento...",
+                        "Calibrando detección facial..."
+                    };
+                    
+                    Timer progressTimer = new Timer(800, e -> {
+                        int index = (int)(System.currentTimeMillis() / 800) % mensajes.length;
+                        publish(mensajes[index]);
+                    });
+                    progressTimer.start();
+                    
+                    try {
+                        System.out.println("REGISTRO: Ejecutando inicializarCamara()...");
+                        boolean resultado = manejadorCamara.inicializarCamara();
+                        System.out.println("REGISTRO: Resultado = " + resultado);
+                        
+                        return resultado;
+                    } finally {
+                        progressTimer.stop();
+                    }
+                }
+                
+                @Override
+                protected void process(java.util.List<String> chunks) {
+                    // Actualizar estado con el último mensaje
+                    if (!chunks.isEmpty()) {
+                        String ultimoMensaje = chunks.get(chunks.size() - 1);
+                        actualizarEstado(ultimoMensaje);
+                        
+                        // Mostrar progreso en vista previa EXACTAMENTE como el login
+                        mostrarEstadoCamaraModerno(ultimoMensaje, new Color(243, 156, 18));
+                    }
                 }
                 
                 @Override
                 protected void done() {
                     try {
                         boolean exito = get();
+                        System.out.println("REGISTRO: Resultado final = " + exito);
+                        
                         if (exito) {
                             camaraActiva = true;
-                            btnActivarCamara.setText("CÁMARA ACTIVA");
+                            
+                            // Actualizar botón con estilo premium exitoso
+                            btnActivarCamara.setText("CAMARA ACTIVA");
+                            btnActivarCamara.setBackground(new Color(46, 204, 113)); // Verde exitoso
                             btnActivarCamara.setEnabled(false);
                             btnCapturarMuestra.setEnabled(true);
-                            lblCamara.setText("TRANSMITIENDO");
-                            lblCamara.setBackground(COLOR_SECUNDARIO);
-                            actualizarEstado("Cámara activa - Listo para captura");
-                            iniciarStreamVideo(); // Iniciar stream de video
+                            
+                            // Iniciar stream de video HD
+                            iniciarStreamVideoHD();
+                            
+                            actualizarEstado("Camara activa - Vista previa habilitada");
+                            
+                            System.out.println("REGISTRO: Cámara activada exitosamente");
                         } else {
-                            mostrarError("No se pudo activar la cámara");
+                            // Restaurar botón con estilo de error
+                            btnActivarCamara.setText("ACTIVAR CAMARA");
+                            btnActivarCamara.setBackground(new Color(52, 152, 219));
+                            btnActivarCamara.setEnabled(true);
+                            
+                            // Mostrar error en vista previa
+                            detenerStreamVideoHD();
+                            
+                            System.out.println("REGISTRO: Fallo en activación de cámara");
+                            mostrarError("No se pudo activar la cámara.\n\n" +
+                                       "Posibles soluciones:\n" +
+                                       "• Verifique que no esté siendo usada por otra aplicación\n" +
+                                       "• Revise permisos de cámara en Windows\n" +
+                                       "• Asegúrese de que los drivers estén instalados");
+                            actualizarEstado("Error activando cámara");
                         }
                     } catch (Exception e) {
+                        // Restaurar estado del botón
+                        btnActivarCamara.setText("ACTIVAR CAMARA");
+                        btnActivarCamara.setBackground(new Color(52, 152, 219));
+                        btnActivarCamara.setEnabled(true);
+                        
+                        // Mostrar error en vista previa
+                        mostrarEstadoCamaraModerno("Error de Conexion", new Color(231, 76, 60));
+                        
+                        System.err.println("REGISTRO: Excepción = " + e.getMessage());
+                        e.printStackTrace();
                         mostrarError("Error activando cámara: " + e.getMessage());
+                        actualizarEstado("Error en activación de cámara");
                     }
                 }
             };
             
             worker.execute();
+        } else {
+            System.out.println("REGISTRO: Cámara ya está activa");
+            actualizarEstado("Cámara ya está activa");
         }
     }
 
@@ -743,7 +988,7 @@ public class FormularioRegistroCompleto extends JFrame {
         if (formValido) {
             btnRegistrar.setBackground(COLOR_SECUNDARIO);
             btnRegistrar.setForeground(Color.BLACK); // Asegurar texto negro
-            actualizarEstado(">> Listo para registrar - Haga clic en REGISTRAR USUARIO");
+            actualizarEstado(">> Listo para registrar - Haga clic en Registrar");
         }
     }
 
@@ -907,15 +1152,20 @@ public class FormularioRegistroCompleto extends JFrame {
      */
     private JTextField crearCampoTextoModerno() {
         JTextField campo = new JTextField();
-        campo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        campo.setPreferredSize(new Dimension(250, 35));
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        campo.setPreferredSize(new Dimension(450, 40)); // Más ancho: de 380 a 450
+        campo.setMinimumSize(new Dimension(450, 40));   // Asegurar tamaño mínimo
         
-        // Borde inicial
-        Color bordeNormal = new Color(200, 200, 200);
-        Color bordeFocus = new Color(100, 149, 237);
+        // Colores más visibles para los bordes
+        Color bordeNormal = new Color(150, 150, 150);  // Gris más oscuro
+        Color bordeFocus = new Color(100, 149, 237);   // Azul focus
+        
+        // Fondo blanco para mejor contraste
+        campo.setBackground(Color.WHITE);
+        campo.setOpaque(true);
         
         campo.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(bordeNormal, 1),
+            BorderFactory.createLineBorder(bordeNormal, 2),  // Borde más grueso
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         
@@ -932,7 +1182,7 @@ public class FormularioRegistroCompleto extends JFrame {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 campo.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(bordeNormal, 1),
+                    BorderFactory.createLineBorder(bordeNormal, 2),  // Mantener borde visible
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
             }
@@ -946,15 +1196,20 @@ public class FormularioRegistroCompleto extends JFrame {
      */
     private JPasswordField crearCampoPasswordModerno() {
         JPasswordField campo = new JPasswordField();
-        campo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        campo.setPreferredSize(new Dimension(250, 35));
+        campo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        campo.setPreferredSize(new Dimension(450, 40)); // Más ancho: de 380 a 450
+        campo.setMinimumSize(new Dimension(450, 40));   // Asegurar tamaño mínimo
         
-        // Borde inicial
-        Color bordeNormal = new Color(200, 200, 200);
-        Color bordeFocus = new Color(100, 149, 237);
+        // Colores más visibles para los bordes
+        Color bordeNormal = new Color(150, 150, 150);  // Gris más oscuro
+        Color bordeFocus = new Color(100, 149, 237);   // Azul focus
+        
+        // Fondo blanco para mejor contraste
+        campo.setBackground(Color.WHITE);
+        campo.setOpaque(true);
         
         campo.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(bordeNormal, 1),
+            BorderFactory.createLineBorder(bordeNormal, 2),  // Borde más grueso
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         
@@ -971,7 +1226,7 @@ public class FormularioRegistroCompleto extends JFrame {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 campo.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(bordeNormal, 1),
+                    BorderFactory.createLineBorder(bordeNormal, 2),  // Mantener borde visible
                     BorderFactory.createEmptyBorder(5, 10, 5, 10)
                 ));
             }
@@ -985,13 +1240,14 @@ public class FormularioRegistroCompleto extends JFrame {
      */
     private JButton crearBotonModerno(String texto, Color colorNormal, Color colorHover) {
         JButton boton = new JButton(texto);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         boton.setBackground(colorNormal);
-        boton.setForeground(Color.BLACK); // Texto negro siempre
+        boton.setForeground(Color.BLACK); // Usar Color.BLACK directamente
         boton.setFocusPainted(false);
         boton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boton.setPreferredSize(new Dimension(160, 40));
+        boton.setOpaque(true); // Asegurar que sea opaco
         
         // Bordes redondeados simulados con padding
         boton.setBorder(BorderFactory.createCompoundBorder(
@@ -1002,20 +1258,24 @@ public class FormularioRegistroCompleto extends JFrame {
         // Efectos hover modernos
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                boton.setBackground(colorHover);
-                boton.setForeground(Color.BLACK); // Texto negro siempre
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(colorHover, 2),
-                    BorderFactory.createEmptyBorder(9, 19, 9, 19)
-                ));
+                if (boton.isEnabled()) {
+                    boton.setBackground(colorHover);
+                    boton.setForeground(Color.BLACK); // Usar Color.BLACK directamente
+                    boton.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(colorHover, 2),
+                        BorderFactory.createEmptyBorder(9, 19, 9, 19)
+                    ));
+                }
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                boton.setBackground(colorNormal);
-                boton.setForeground(Color.BLACK); // Texto negro siempre
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(colorNormal, 1),
-                    BorderFactory.createEmptyBorder(10, 20, 10, 20)
-                ));
+                if (boton.isEnabled()) {
+                    boton.setBackground(colorNormal);
+                    boton.setForeground(Color.BLACK); // Usar Color.BLACK directamente
+                    boton.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(colorNormal, 1),
+                        BorderFactory.createEmptyBorder(10, 20, 10, 20)
+                    ));
+                }
             }
         });
         
