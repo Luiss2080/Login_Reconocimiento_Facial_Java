@@ -297,8 +297,39 @@ public class CifradorContrasenas {
 
     private boolean esContrasenaComun(String contrasena) {
         String contrasenaLower = contrasena.toLowerCase();
-
-        // Lista de contraseñas comunes débiles
+        
+        // Si la contraseña cumple con criterios de fortaleza, no la rechazamos por patrones simples
+        if (contrasena.length() >= 8 && 
+            contrasena.matches(".*[A-Z].*") && 
+            contrasena.matches(".*[a-z].*") && 
+            contrasena.matches(".*[0-9].*")) {
+            
+            // Solo rechazar si es EXACTAMENTE una contraseña común completa
+            String[] contrasenasExactasComunes = {
+                "password", "123456", "12345678", "qwerty", "abc123",
+                "password123", "admin", "letmein", "welcome", "monkey",
+                "dragon", "master", "shadow", "superman", "michael",
+                "football", "baseball", "soccer", "charlie", "jordan"
+            };
+            
+            for (String comun : contrasenasExactasComunes) {
+                if (contrasenaLower.equals(comun)) {
+                    return true;
+                }
+            }
+            
+            // Para contraseñas fuertes, solo rechazar secuencias muy obvias
+            if (contrasenaLower.equals("123456789") || 
+                contrasenaLower.equals("abcdefgh") ||
+                contrasenaLower.matches("^123+$") ||
+                contrasenaLower.matches("^abc+$")) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Para contraseñas débiles, usar validación estricta original
         String[] contrasenasComunes = {
             "password", "123456", "12345678", "qwerty", "abc123",
             "password123", "admin", "letmein", "welcome", "monkey",
@@ -312,7 +343,7 @@ public class CifradorContrasenas {
             }
         }
 
-        // Verificar secuencias numéricas
+        // Verificar secuencias numéricas solo para contraseñas débiles
         if (contrasenaLower.matches(".*123.*") || contrasenaLower.matches(".*abc.*")) {
             return true;
         }

@@ -155,7 +155,7 @@ public class FormularioRegistroCompleto extends JFrame {
         crearPanelBotones();
         
         // Estado
-        lblEstado = new JLabel("Complete el formulario y capture sus imágenes faciales");
+        lblEstado = new JLabel("Complete el formulario con sus datos personales");
         lblEstado.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblEstado.setHorizontalAlignment(SwingConstants.CENTER);
         lblEstado.setForeground(COLOR_PRIMARIO);
@@ -181,7 +181,7 @@ public class FormularioRegistroCompleto extends JFrame {
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Subtítulo
-        JLabel lblSubtitulo = new JLabel("Complete sus datos y capture imágenes para el reconocimiento facial");
+        JLabel lblSubtitulo = new JLabel("Complete sus datos personales para crear su cuenta de acceso");
         lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblSubtitulo.setForeground(new Color(189, 195, 199));
         lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -436,7 +436,7 @@ public class FormularioRegistroCompleto extends JFrame {
         progressCaptura.setBackground(COLOR_FONDO);
         progressCaptura.setForeground(COLOR_ACENTO);
         
-        lblMuestrasCapturadas = new JLabel("<html><center>📷 Primero active la cámara, luego capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro<br><b>El botón de captura aparecerá cuando la cámara esté activa</b></center></html>");
+        lblMuestrasCapturadas = new JLabel("<html><center>📷 OPCIONAL: Active la cámara y capture " + MUESTRAS_REQUERIDAS + " imágenes (para simulación futura)<br><b>Puede registrarse sin esto</b></center></html>");
         lblMuestrasCapturadas.setFont(FONT_LABEL);
         lblMuestrasCapturadas.setForeground(new Color(100, 100, 100));
         lblMuestrasCapturadas.setHorizontalAlignment(SwingConstants.CENTER);
@@ -556,21 +556,41 @@ public class FormularioRegistroCompleto extends JFrame {
      * ⚡ Configurar validación en tiempo real
      */
     private void configurarValidacionTiempoReal() {
-        // Listener para habilitar botón registrar
-        ActionListener validarFormulario = e -> validarYHabilitarRegistro();
+        // DocumentListener para validación mientras se escribe
+        javax.swing.event.DocumentListener validarFormulario = new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> validarYHabilitarRegistro());
+            }
+            
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> validarYHabilitarRegistro());
+            }
+            
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> validarYHabilitarRegistro());
+            }
+        };
         
-        txtNombreUsuario.addActionListener(validarFormulario);
-        txtNombreCompleto.addActionListener(validarFormulario);
-        txtCorreo.addActionListener(validarFormulario);
-        txtContrasena.addActionListener(validarFormulario);
-        txtConfirmarContrasena.addActionListener(validarFormulario);
+        // Agregar listeners a todos los campos de texto
+        txtNombreUsuario.getDocument().addDocumentListener(validarFormulario);
+        txtNombreCompleto.getDocument().addDocumentListener(validarFormulario);
+        txtCorreo.getDocument().addDocumentListener(validarFormulario);
+        txtTelefono.getDocument().addDocumentListener(validarFormulario);
+        txtContrasena.getDocument().addDocumentListener(validarFormulario);
+        txtConfirmarContrasena.getDocument().addDocumentListener(validarFormulario);
+        
+        // Validación inicial
+        SwingUtilities.invokeLater(() -> validarYHabilitarRegistro());
     }
 
     /**
      * 🪟 Configurar ventana
      */
     private void configurarVentana() {
-        setTitle("Registro de Usuario - Sistema de Reconocimiento Facial");
+        setTitle("Registro de Nuevo Usuario - Sistema de Autenticación");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
@@ -752,17 +772,16 @@ public class FormularioRegistroCompleto extends JFrame {
         actualizarEstado("Bienvenido al registro del sistema");
         
         SwingUtilities.invokeLater(() -> {
-            String mensaje = "REGISTRO DE NUEVO USUARIO\n\n" +
-                    "Pasos a seguir:\n" +
-                    "1. Complete todos los campos del formulario\n" +
-                    "2. Active la cámara para captura facial\n" +
-                    "3. Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro\n" +
-                    "4. Confirme el registro\n\n" +
-                    "Consejos:\n" +
-                    "• Use buena iluminación\n" +
-                    "• Mantenga el rostro centrado\n" +
-                    "• Evite obstrucciones (lentes, sombreros)\n" +
-                    "• Varíe ligeramente la posición entre capturas";
+            String mensaje = "CREAR NUEVA CUENTA DE USUARIO \ud83d\udc64\n\n" +
+                    "PASOS PARA REGISTRARSE:\n" +
+                    "1. ✅ Complete todos los campos del formulario (OBLIGATORIO)\n" +
+                    "2. 📷 Active la cámara (OPCIONAL - para simulación)\n" +
+                    "3. 📷 Capture " + MUESTRAS_REQUERIDAS + " imágenes (OPCIONAL)\n" +
+                    "4. ✅ Haga clic en \"Registrar\" para crear su cuenta\n\n" +
+                    "MÉTODOS DE ACCESO DISPONIBLES:\n" +
+                    "✅ Usuario y contraseña (autenticación principal)\n" +
+                    "📷 Reconocimiento facial (solo para demostración)\n\n" +
+                    "NOTA: Puede registrarse sin capturar imágenes faciales.";
                     
             JOptionPane.showMessageDialog(this, mensaje, "Guía de Registro", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -1059,13 +1078,15 @@ public class FormularioRegistroCompleto extends JFrame {
      * 🎉 Mostrar registro exitoso
      */
     private void mostrarRegistroExitoso() {
-        String mensaje = "🎉 ¡REGISTRO EXITOSO!\n\n" +
+        int muestrasCount = (muestrasFaciales != null) ? muestrasFaciales.size() : 0;
+        String mensaje = "🎉 ¡CUENTA CREADA EXITOSAMENTE!\n\n" +
                 "Usuario: " + txtNombreUsuario.getText() + "\n" +
                 "Nombre: " + txtNombreCompleto.getText() + "\n" +
-                "Muestras faciales: " + muestrasFaciales.size() + "\n\n" +
-                "Ya puede usar el sistema con:\n" +
-                "• Sus credenciales de usuario\n" +
-                "• Reconocimiento facial\n\n" +
+                "Email: " + txtCorreo.getText() + "\n" +
+                "Imágenes guardadas: " + muestrasCount + " (para simulación)\n\n" +
+                "MÉTODOS DE ACCESO DISPONIBLES:\n" +
+                "✅ Usuario y contraseña (principal)\n" +
+                "📷 Reconocimiento facial (simulación)\n\n" +
                 "¿Desea ir al login ahora?";
         
         int opcion = JOptionPane.showConfirmDialog(this, mensaje, 
@@ -1136,26 +1157,22 @@ public class FormularioRegistroCompleto extends JFrame {
         // 🔧 RECONOCIMIENTO FACIAL OPCIONAL - No bloquea el registro
         // Mostrar advertencia si no hay muestras suficientes pero permitir continuar
         if (muestrasFaciales == null || muestrasFaciales.size() < MUESTRAS_REQUERIDAS) {
-            System.out.println("AVISO: Registro sin reconocimiento facial - Muestras: " + 
+            System.out.println("INFO: Registro con credenciales únicamente - Muestras faciales: " + 
                              (muestrasFaciales != null ? muestrasFaciales.size() : 0) + 
-                             "/" + MUESTRAS_REQUERIDAS);
+                             "/" + MUESTRAS_REQUERIDAS + " (Opcional)");
             
-            // Mostrar diálogo informativo pero no bloquear
-            int opcion = JOptionPane.showConfirmDialog(
+            // Mostrar mensaje informativo que es normal registrarse sin reconocimiento facial
+            JOptionPane.showMessageDialog(
                 this,
-                "⚠️ REGISTRO SIN RECONOCIMIENTO FACIAL\n\n" +
-                "No has capturado las muestras faciales requeridas.\n" +
-                "Muestras actuales: " + (muestrasFaciales != null ? muestrasFaciales.size() : 0) + "/" + MUESTRAS_REQUERIDAS + "\n\n" +
-                "¿Deseas continuar con el registro sin reconocimiento facial?\n" +
-                "(Podrás configurarlo después desde tu perfil)",
-                "Confirmación de Registro",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
+                "ℹ️ REGISTRO POR CREDENCIALES\n\n" +
+                "Su cuenta se creará con autenticación por credenciales:\n" +
+                "• Usuario y contraseña (principal)\n" +
+                "• Reconocimiento facial (opcional para uso futuro)\n\n" +
+                "Las imágenes faciales se guardarán para simular\n" +
+                "el funcionamiento del sistema biométrico.",
+                "Información de Registro",
+                JOptionPane.INFORMATION_MESSAGE
             );
-            
-            if (opcion != JOptionPane.YES_OPTION) {
-                return false; // Usuario decidió no continuar
-            }
         } else {
             // Validar que las muestras existentes no sean nulas
             long muestrasValidas = muestrasFaciales.stream().filter(m -> m != null).count();
@@ -1172,28 +1189,72 @@ public class FormularioRegistroCompleto extends JFrame {
      * 🔄 Validar y habilitar botón de registro
      */
     private void validarYHabilitarRegistro() {
-        // ✅ Validación basada solo en campos obligatorios (sin reconocimiento facial)
-        boolean formValido = !txtNombreUsuario.getText().trim().isEmpty() &&
-                           !txtNombreCompleto.getText().trim().isEmpty() &&
-                           !txtCorreo.getText().trim().isEmpty() &&
-                           txtContrasena.getPassword().length >= 6 &&
-                           new String(txtContrasena.getPassword()).equals(new String(txtConfirmarContrasena.getPassword()));
-                           // 🚫 ELIMINADO: && muestrasFaciales.size() >= MUESTRAS_REQUERIDAS
-        
-        btnRegistrar.setEnabled(formValido);
-        
-        if (formValido) {
-            btnRegistrar.setBackground(COLOR_SECUNDARIO);
-            btnRegistrar.setForeground(Color.BLACK); // Asegurar texto negro
+        try {
+            // Obtener valores de los campos
+            String nombreUsuario = txtNombreUsuario.getText().trim();
+            String nombreCompleto = txtNombreCompleto.getText().trim();
+            String correo = txtCorreo.getText().trim();
+            char[] contrasena = txtContrasena.getPassword();
+            char[] confirmarContrasena = txtConfirmarContrasena.getPassword();
             
-            // Mensaje dinámico según si tiene muestras faciales
-            String estado;
-            if (muestrasFaciales != null && muestrasFaciales.size() >= MUESTRAS_REQUERIDAS) {
-                estado = "✅ Listo para registrar CON reconocimiento facial";
+            // ✅ Validación de campos obligatorios (teléfono es opcional)
+            boolean camposCompletos = !nombreUsuario.isEmpty() &&
+                                    !nombreCompleto.isEmpty() &&
+                                    !correo.isEmpty() &&
+                                    contrasena.length >= 6;
+            
+            // ✅ Validación de coincidencia de contraseñas
+            boolean contrasenasCoinciden = java.util.Arrays.equals(contrasena, confirmarContrasena);
+            
+            // ✅ Validación básica de formato de email
+            boolean emailValido = correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+            
+            // ✅ Validación de política de contraseñas (sincronizada con backend)
+            String contrasenaStr = new String(contrasena);
+            boolean contrasenaValida = validarPoliticaContrasenaCompleta(contrasenaStr) == null;
+            
+            // Formulario válido si todos los campos están completos y las contraseñas coinciden
+            boolean formValido = camposCompletos && contrasenasCoinciden && emailValido && contrasenaValida;
+            
+            // Activar/desactivar botón
+            btnRegistrar.setEnabled(formValido);
+            
+            if (formValido) {
+                btnRegistrar.setBackground(COLOR_SECUNDARIO);
+                btnRegistrar.setForeground(Color.BLACK);
+                
+                // Mensaje dinámico según si tiene muestras faciales
+                String estado;
+                if (muestrasFaciales != null && muestrasFaciales.size() >= MUESTRAS_REQUERIDAS) {
+                    estado = "✅ Listo para registrar CON reconocimiento facial";
+                } else {
+                    estado = "✅ Listo para registrar SIN reconocimiento facial (opcional)";
+                }
+                actualizarEstado(estado);
             } else {
-                estado = "✅ Listo para registrar SIN reconocimiento facial (opcional)";
+                btnRegistrar.setBackground(Color.LIGHT_GRAY);
+                btnRegistrar.setForeground(Color.DARK_GRAY);
+                
+                // Mensaje de qué falta
+                if (!camposCompletos) {
+                    actualizarEstado("⚠️ Complete todos los campos obligatorios");
+                } else if (!contrasenasCoinciden) {
+                    actualizarEstado("⚠️ Las contraseñas no coinciden");
+                } else if (!emailValido) {
+                    actualizarEstado("⚠️ Formato de email inválido");
+                } else if (!contrasenaValida) {
+                    String mensajeError = validarPoliticaContrasenaCompleta(contrasenaStr);
+                    actualizarEstado("⚠️ " + mensajeError);
+                }
             }
-            actualizarEstado(estado);
+            
+            // Limpiar arrays de contraseñas por seguridad
+            java.util.Arrays.fill(contrasena, ' ');
+            java.util.Arrays.fill(confirmarContrasena, ' ');
+            
+        } catch (Exception e) {
+            System.err.println("Error en validación: " + e.getMessage());
+            btnRegistrar.setEnabled(false);
         }
     }
 
@@ -1235,7 +1296,7 @@ public class FormularioRegistroCompleto extends JFrame {
         muestrasFaciales.clear();
         progressCaptura.setValue(0);
         progressCaptura.setString("0 / " + MUESTRAS_REQUERIDAS + " muestras");
-        lblMuestrasCapturadas.setText("✨ Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro");
+        lblMuestrasCapturadas.setText("📷 OPCIONAL: Capture " + MUESTRAS_REQUERIDAS + " imágenes (para simulación)");
         lblMuestrasCapturadas.setForeground(Color.BLACK);
         
         btnCapturarMuestra.setEnabled(false);
@@ -1555,7 +1616,67 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 🚀 Método principal para pruebas
+     * � Validar política completa de contraseñas (sincronizada con backend)
+     */
+    private String validarPoliticaContrasenaCompleta(String contrasena) {
+        if (contrasena == null || contrasena.isEmpty()) {
+            return "La contraseña es requerida";
+        }
+        
+        // Longitud mínima y máxima
+        if (contrasena.length() < 8) {
+            return "La contraseña debe tener al menos 8 caracteres";
+        }
+        
+        if (contrasena.length() > 128) {
+            return "La contraseña no puede tener más de 128 caracteres";
+        }
+        
+        // Verificar mayúsculas
+        if (!contrasena.matches(".*[A-Z].*")) {
+            return "La contraseña debe contener al menos una letra mayúscula";
+        }
+        
+        // Verificar minúsculas
+        if (!contrasena.matches(".*[a-z].*")) {
+            return "La contraseña debe contener al menos una letra minúscula";
+        }
+        
+        // Verificar números
+        if (!contrasena.matches(".*[0-9].*")) {
+            return "La contraseña debe contener al menos un número";
+        }
+        
+        // Verificar contraseñas comunes (sincronizado con backend)
+        String contrasenaLower = contrasena.toLowerCase();
+        String[] contrasenasComunes = {
+            "password", "123456", "12345678", "qwerty", "abc123",
+            "password123", "admin", "letmein", "welcome", "monkey",
+            "dragon", "master", "shadow", "superman", "michael",
+            "football", "baseball", "soccer", "charlie", "jordan"
+        };
+        
+        for (String comun : contrasenasComunes) {
+            if (contrasenaLower.contains(comun)) {
+                return "La contraseña es demasiado común. Use una más segura.";
+            }
+        }
+        
+        // Verificar secuencias comunes
+        if (contrasenaLower.matches(".*123.*") || contrasenaLower.matches(".*abc.*")) {
+            return "La contraseña no puede contener secuencias obvias (123, abc)";
+        }
+        
+        // Verificar caracteres repetidos
+        if (contrasena.matches(".*(.)\\1{2,}.*")) {
+            return "La contraseña no puede tener más de 3 caracteres iguales consecutivos";
+        }
+        
+        return null; // Contraseña válida
+    }
+
+    /**
+     * �🚀 Método principal para pruebas
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

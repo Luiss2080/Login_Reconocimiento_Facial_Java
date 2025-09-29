@@ -1,5 +1,6 @@
 package com.reconocimiento.facial.servicios;
 
+import com.reconocimiento.facial.basedatos.ConexionBaseDatos;
 import com.reconocimiento.facial.dao.UsuarioDAO;
 import com.reconocimiento.facial.dto.UsuarioDTO;
 import com.reconocimiento.facial.modelos.Usuario;
@@ -11,6 +12,9 @@ import com.reconocimiento.facial.procesamiento.IntegradorOpenCV.ResultadoAutenti
 import com.reconocimiento.facial.procesamiento.IntegradorOpenCV.InformacionDeteccionRostros;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -222,11 +226,9 @@ public class ServicioUsuarioMejorado {
                 return false;
             }
             
-            // Validar muestras faciales
-            if (muestrasFaciales == null || muestrasFaciales.size() < 3) {
-                System.err.println("❌ Se requieren al menos 3 muestras faciales");
-                return false;
-            }
+            // Información sobre muestras faciales (ahora opcional)
+            int numeroMuestras = (muestrasFaciales != null) ? muestrasFaciales.size() : 0;
+            System.out.println("📷 Muestras faciales recibidas: " + numeroMuestras + " (opcional para simulación)");
             
             // Crear usuario
             Usuario nuevoUsuario = new Usuario();
@@ -244,38 +246,49 @@ public class ServicioUsuarioMejorado {
                 return false;
             }
             
-            // Registrar características faciales con OpenCV integrado
-            boolean registroOpenCVExitoso = false;
-            boolean registroRedNeuronalExitoso = false;
-            
-            // 1. Registro con IntegradorOpenCV (Algoritmos avanzados)
-            if (integradorOpenCV.isSistemaInicializado()) {
-                registroOpenCVExitoso = integradorOpenCV.registrarUsuarioFacial(
-                    usuarioDTO.getNombreUsuario(), 
-                    muestrasFaciales
-                );
-                System.out.println("🔧 Registro OpenCV: " + (registroOpenCVExitoso ? "✅ Exitoso" : "❌ Falló"));
-            }
-            
-            // 2. Registro con RedNeuronal (Backup y compatibilidad)
-            registroRedNeuronalExitoso = redNeuronal.registrarUsuario(
-                usuarioDTO.getNombreUsuario(), 
-                muestrasFaciales
-            );
-            System.out.println("🧠 Registro Red Neuronal: " + (registroRedNeuronalExitoso ? "✅ Exitoso" : "❌ Falló"));
-            
-            // Evaluación del resultado
-            if (registroOpenCVExitoso || registroRedNeuronalExitoso) {
-                System.out.println("✅ Usuario registrado exitosamente con reconocimiento facial");
-                if (registroOpenCVExitoso && registroRedNeuronalExitoso) {
-                    System.out.println("🚀 Doble algoritmo activo: OpenCV + Red Neuronal");
-                } else if (registroOpenCVExitoso) {
-                    System.out.println("🔧 Reconocimiento por OpenCV activo");
+            // Procesar y guardar imágenes faciales si están disponibles
+            boolean registroFacialExitoso = false;
+            if (muestrasFaciales != null && !muestrasFaciales.isEmpty()) {
+                // Guardar imágenes en base de datos para simulación
+                registroFacialExitoso = guardarImagenesFacialesEnDB(usuarioGuardado.getIdUsuario(), muestrasFaciales);
+                
+                // Registrar características faciales con OpenCV integrado (si hay suficientes muestras)
+                boolean registroOpenCVExitoso = false;
+                boolean registroRedNeuronalExitoso = false;
+                
+                if (muestrasFaciales.size() >= 3) {
+                    // 1. Registro con IntegradorOpenCV (Algoritmos avanzados)
+                    if (integradorOpenCV.isSistemaInicializado()) {
+                        registroOpenCVExitoso = integradorOpenCV.registrarUsuarioFacial(
+                            usuarioDTO.getNombreUsuario(), 
+                            muestrasFaciales
+                        );
+                        System.out.println("🔧 Registro OpenCV: " + (registroOpenCVExitoso ? "✅ Exitoso" : "❌ Falló"));
+                    }
+                    
+                    // 2. Registro con RedNeuronal (Backup y compatibilidad)
+                    registroRedNeuronalExitoso = redNeuronal.registrarUsuario(
+                        usuarioDTO.getNombreUsuario(), 
+                        muestrasFaciales
+                    );
+                    System.out.println("🧠 Registro Red Neuronal: " + (registroRedNeuronalExitoso ? "✅ Exitoso" : "❌ Falló"));
+                    
+                    registroFacialExitoso = registroOpenCVExitoso || registroRedNeuronalExitoso;
                 } else {
-                    System.out.println("🧠 Reconocimiento por Red Neuronal activo");
+                    System.out.println("ℹ️ Pocas muestras para reconocimiento activo, pero imágenes guardadas para simulación");
                 }
             } else {
-                System.err.println("⚠️ Error en registro facial, pero usuario creado para login por credenciales");
+                System.out.println("ℹ️ Registro completado sin imágenes faciales (solo credenciales)");
+            }
+            
+            // Evaluación del resultado
+            System.out.println("✅ Usuario registrado exitosamente: " + usuarioDTO.getNombreUsuario());
+            System.out.println("📋 Métodos de acceso configurados:");
+            System.out.println("  ✅ Credenciales (usuario + contraseña) - ACTIVO");
+            if (registroFacialExitoso) {
+                System.out.println("  � Reconocimiento facial - DISPONIBLE PARA SIMULACIÓN");
+            } else {
+                System.out.println("  📷 Reconocimiento facial - NO CONFIGURADO");
             }
             
             System.out.println("✅ Usuario registrado exitosamente: " + usuarioDTO.getNombreUsuario());
@@ -435,7 +448,68 @@ public class ServicioUsuarioMejorado {
     }
 
     /**
-     * 🔧 Getters para componentes internos (para testing)
+     * � Guardar imágenes faciales en la base de datos para simulación
+     */
+    private boolean guardarImagenesFacialesEnDB(int usuarioId, List<BufferedImage> imagenes) {
+        try {
+            System.out.println("💾 Guardando " + imagenes.size() + " imágenes faciales en base de datos...");
+            
+            Connection conexion = ConexionBaseDatos.obtenerInstancia().obtenerConexion();
+            String sql = "INSERT INTO caracteristicas_faciales (usuario_id, vector_caracteristicas, hash_facial, " +
+                        "imagen_facial, formato_imagen, dimension_imagen, confianza_registro, numero_muestra, " +
+                        "version_algoritmo, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            PreparedStatement stmt = conexion.prepareStatement(sql);
+            
+            int imagenesGuardadas = 0;
+            for (int i = 0; i < imagenes.size(); i++) {
+                BufferedImage imagen = imagenes.get(i);
+                if (imagen == null) continue;
+                
+                try {
+                    // Convertir imagen a bytes
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    javax.imageio.ImageIO.write(imagen, "JPG", baos);
+                    byte[] imagenBytes = baos.toByteArray();
+                    
+                    // Generar datos básicos de simulación
+                    String vectorSimulado = "[0.1,0.2,0.3,0.4,0.5]"; // Vector simplificado para simulación
+                    String hashFacial = "hash_" + usuarioId + "_" + (i + 1);
+                    String dimension = imagen.getWidth() + "x" + imagen.getHeight();
+                    
+                    // Establecer parámetros
+                    stmt.setInt(1, usuarioId);
+                    stmt.setString(2, vectorSimulado);
+                    stmt.setString(3, hashFacial);
+                    stmt.setBytes(4, imagenBytes);
+                    stmt.setString(5, "JPG");
+                    stmt.setString(6, dimension);
+                    stmt.setDouble(7, 0.75); // Confianza simulada
+                    stmt.setInt(8, i + 1); // Número de muestra
+                    stmt.setString(9, "v2.0_simulacion");
+                    stmt.setBoolean(10, true);
+                    
+                    stmt.executeUpdate();
+                    imagenesGuardadas++;
+                    
+                } catch (Exception e) {
+                    System.err.println("⚠️ Error guardando imagen " + (i + 1) + ": " + e.getMessage());
+                }
+            }
+            
+            stmt.close();
+            System.out.println("✅ " + imagenesGuardadas + " imágenes guardadas en base de datos");
+            return imagenesGuardadas > 0;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error guardando imágenes faciales: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * �🔧 Getters para componentes internos (para testing)
      */
     public RedNeuronalReconocimiento getRedNeuronal() { return redNeuronal; }
     public UsuarioDAO getUsuarioDAO() { return usuarioDAO; }

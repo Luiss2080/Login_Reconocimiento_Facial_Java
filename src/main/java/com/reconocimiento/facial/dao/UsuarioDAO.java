@@ -24,11 +24,11 @@ public class UsuarioDAO {
 
     // Consultas SQL preparadas
     private static final String SQL_INSERTAR_USUARIO =
-        "INSERT INTO usuarios (nombre_usuario, correo_electronico, contrasena_cifrada, nombre_completo, " +
-        "fecha_creacion, fecha_actualizacion, esta_activo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO usuarios (nombre_usuario, email, contrasena_hash, nombre_completo, " +
+        "fecha_registro, fecha_actualizacion, activo) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_BUSCAR_POR_ID =
-        "SELECT * FROM usuarios WHERE id_usuario = ?";
+        "SELECT * FROM usuarios WHERE id = ?";
 
     private static final String SQL_BUSCAR_POR_NOMBRE_USUARIO =
         "SELECT * FROM usuarios WHERE nombre_usuario = ?";
@@ -37,30 +37,30 @@ public class UsuarioDAO {
         "SELECT * FROM usuarios WHERE email = ?";
 
     private static final String SQL_ACTUALIZAR_USUARIO =
-        "UPDATE usuarios SET nombre_usuario = ?, correo_electronico = ?, contrasena_cifrada = ?, " +
-        "nombre_completo = ?, fecha_actualizacion = ?, esta_activo = ?, ultimo_acceso = ? WHERE id_usuario = ?";
+        "UPDATE usuarios SET nombre_usuario = ?, email = ?, contrasena_hash = ?, " +
+        "nombre_completo = ?, fecha_actualizacion = ?, activo = ?, fecha_ultimo_acceso = ? WHERE id = ?";
 
     private static final String SQL_OBTENER_USUARIOS_ACTIVOS =
-        "SELECT * FROM usuarios WHERE esta_activo = TRUE ORDER BY nombre_completo";
+        "SELECT * FROM usuarios WHERE activo = TRUE ORDER BY nombre_completo";
 
     private static final String SQL_OBTENER_TODOS_USUARIOS =
-        "SELECT * FROM usuarios ORDER BY fecha_creacion DESC";
+        "SELECT * FROM usuarios ORDER BY fecha_registro DESC";
 
     private static final String SQL_CONTAR_USUARIOS =
-        "SELECT COUNT(*) FROM usuarios WHERE esta_activo = TRUE";
+        "SELECT COUNT(*) FROM usuarios WHERE activo = TRUE";
 
     private static final String SQL_EXISTE_USUARIO =
         "SELECT COUNT(*) FROM usuarios WHERE nombre_usuario = ?";
 
     private static final String SQL_EXISTE_CORREO =
-        "SELECT COUNT(*) FROM usuarios WHERE correo_electronico = ?";
+        "SELECT COUNT(*) FROM usuarios WHERE email = ?";
 
     private static final String SQL_BUSCAR_USUARIOS_POR_PATRON =
-        "SELECT * FROM usuarios WHERE (nombre_usuario LIKE ? OR nombre_completo LIKE ? OR correo_electronico LIKE ?) " +
-        "AND esta_activo = TRUE ORDER BY nombre_completo";
+        "SELECT * FROM usuarios WHERE (nombre_usuario LIKE ? OR nombre_completo LIKE ? OR email LIKE ?) " +
+        "AND activo = TRUE ORDER BY nombre_completo";
 
     private static final String SQL_ACTUALIZAR_ULTIMO_ACCESO =
-        "UPDATE usuarios SET ultimo_acceso = ? WHERE id_usuario = ?";
+        "UPDATE usuarios SET fecha_ultimo_acceso = ? WHERE id = ?";
 
     public UsuarioDAO() {
         try {
@@ -481,15 +481,15 @@ public class UsuarioDAO {
     private Usuario mapearResultSetAUsuario(ResultSet resultSet) throws SQLException {
         Usuario usuario = new Usuario();
 
-        usuario.setIdUsuario(resultSet.getInt("id_usuario"));
+        usuario.setIdUsuario(resultSet.getInt("id"));
         usuario.setNombreUsuario(resultSet.getString("nombre_usuario"));
         usuario.setCorreoElectronico(resultSet.getString("email"));
         usuario.setContrasenaCifrada(resultSet.getString("contrasena_hash"));
         usuario.setNombreCompleto(resultSet.getString("nombre_completo"));
-        usuario.setEstaActivo(resultSet.getBoolean("esta_activo"));
+        usuario.setEstaActivo(resultSet.getBoolean("activo"));
 
         // Manejo de fechas
-        Timestamp fechaCreacion = resultSet.getTimestamp("fecha_creacion");
+        Timestamp fechaCreacion = resultSet.getTimestamp("fecha_registro");
         if (fechaCreacion != null) {
             usuario.setFechaCreacion(fechaCreacion.toLocalDateTime());
         }
@@ -499,7 +499,7 @@ public class UsuarioDAO {
             usuario.setFechaActualizacion(fechaActualizacion.toLocalDateTime());
         }
 
-        Timestamp ultimoAcceso = resultSet.getTimestamp("ultimo_acceso");
+        Timestamp ultimoAcceso = resultSet.getTimestamp("fecha_ultimo_acceso");
         if (ultimoAcceso != null) {
             usuario.setUltimoAcceso(ultimoAcceso.toLocalDateTime());
         }

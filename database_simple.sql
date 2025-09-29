@@ -57,6 +57,10 @@ CREATE TABLE caracteristicas_faciales (
     hash_facial VARCHAR(64) NOT NULL,
     confianza_registro DECIMAL(5,4) DEFAULT 0.0000,
     
+    -- Almacenamiento de imagen facial
+    imagen_facial LONGBLOB,
+    formato_imagen VARCHAR(10) DEFAULT 'JPG',
+    
     -- Metadatos de imagen
     ruta_imagen_original VARCHAR(500),
     dimension_imagen VARCHAR(20) DEFAULT '64x64',
