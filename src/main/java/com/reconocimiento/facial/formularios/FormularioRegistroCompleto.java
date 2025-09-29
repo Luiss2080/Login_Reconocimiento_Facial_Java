@@ -212,6 +212,8 @@ public class FormularioRegistroCompleto extends JFrame {
         lblTituloForm.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTituloForm.setForeground(COLOR_PRIMARIO);
         
+        
+
         // Campos del formulario
         JLabel lblNombreUsuario = new JLabel("Nombre de Usuario:");
         lblNombreUsuario.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -236,20 +238,30 @@ public class FormularioRegistroCompleto extends JFrame {
         JLabel lblContrasena = new JLabel("Contrasena:");
         lblContrasena.setFont(new Font("Segoe UI", Font.BOLD, 12));
         txtContrasena = crearCampoPasswordModerno();
-        txtContrasena.setToolTipText("Contrasena segura (minimo 6 caracteres)");
+        txtContrasena.setToolTipText("<html><b>Contraseña Segura Requerida:</b><br>" +
+                                   "• Mínimo 8 caracteres<br>" +
+                                   "• Al menos 1 minúscula (a-z)<br>" +
+                                   "• Al menos 1 mayúscula (A-Z)<br>" +
+                                   "• Al menos 1 número (0-9)<br>" +
+                                   "• Al menos 1 carácter especial (!@#$%^&*)<br>" +
+                                   "• No puede ser una contraseña común<br>" +
+                                   "<b>Ejemplo:</b> MiContra123!</html>");
         
         JLabel lblConfirmar = new JLabel("Confirmar Contrasena:");
         lblConfirmar.setFont(new Font("Segoe UI", Font.BOLD, 12));
         txtConfirmarContrasena = crearCampoPasswordModerno();
-        txtConfirmarContrasena.setToolTipText("Repita la contrasena para confirmar");
+        txtConfirmarContrasena.setToolTipText("Repita exactamente la misma contraseña para confirmar");
         
         // Layout del formulario
         panelFormulario.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
-        gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.insets = new Insets(0, 0, 15, 0);
         panelFormulario.add(lblTituloForm, gbc);
+        
+        // Agregar mensaje informativo
+      
         
         // Configuración para labels: más a la izquierda con menos ancho
         gbc.gridwidth = 1; 
@@ -265,23 +277,30 @@ public class FormularioRegistroCompleto extends JFrame {
         gbcCampos.fill = GridBagConstraints.HORIZONTAL;
         gbcCampos.insets = new Insets(8, 5, 8, 20); // Más margen derecho para campos
         
-        gbc.gridx = 0; gbc.gridy = 1; panelFormulario.add(lblNombreUsuario, gbc);
-        gbcCampos.gridx = 1; gbcCampos.gridy = 1; panelFormulario.add(txtNombreUsuario, gbcCampos);
+        gbc.gridx = 0; gbc.gridy = 2; panelFormulario.add(lblNombreUsuario, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 2; panelFormulario.add(txtNombreUsuario, gbcCampos);
         
-        gbc.gridx = 0; gbc.gridy = 2; panelFormulario.add(lblNombreCompleto, gbc);
-        gbcCampos.gridx = 1; gbcCampos.gridy = 2; panelFormulario.add(txtNombreCompleto, gbcCampos);
+        gbc.gridx = 0; gbc.gridy = 3; panelFormulario.add(lblNombreCompleto, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 3; panelFormulario.add(txtNombreCompleto, gbcCampos);
         
-        gbc.gridx = 0; gbc.gridy = 3; panelFormulario.add(lblCorreo, gbc);
-        gbcCampos.gridx = 1; gbcCampos.gridy = 3; panelFormulario.add(txtCorreo, gbcCampos);
+        gbc.gridx = 0; gbc.gridy = 4; panelFormulario.add(lblCorreo, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 4; panelFormulario.add(txtCorreo, gbcCampos);
         
-        gbc.gridx = 0; gbc.gridy = 4; panelFormulario.add(lblTelefono, gbc);
-        gbcCampos.gridx = 1; gbcCampos.gridy = 4; panelFormulario.add(txtTelefono, gbcCampos);
+        gbc.gridx = 0; gbc.gridy = 5; panelFormulario.add(lblTelefono, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 5; panelFormulario.add(txtTelefono, gbcCampos);
         
-        gbc.gridx = 0; gbc.gridy = 5; panelFormulario.add(lblContrasena, gbc);
-        gbcCampos.gridx = 1; gbcCampos.gridy = 5; panelFormulario.add(txtContrasena, gbcCampos);
+        gbc.gridx = 0; gbc.gridy = 6; panelFormulario.add(lblContrasena, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 6; panelFormulario.add(txtContrasena, gbcCampos);
         
-        gbc.gridx = 0; gbc.gridy = 6; panelFormulario.add(lblConfirmar, gbc);
-        gbcCampos.gridx = 1; gbcCampos.gridy = 6; panelFormulario.add(txtConfirmarContrasena, gbcCampos);
+        gbc.gridx = 0; gbc.gridy = 7; panelFormulario.add(lblConfirmar, gbc);
+        gbcCampos.gridx = 1; gbcCampos.gridy = 7; panelFormulario.add(txtConfirmarContrasena, gbcCampos);
+        
+        // Agregar nota informativa sobre contraseñas
+        JLabel lblAyudaContrasena = new JLabel("<html><center><small><b>💡 Contraseña Segura:</b> 8+ caracteres, mayúsculas, minúsculas, números y símbolos</small></center></html>");
+        lblAyudaContrasena.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        lblAyudaContrasena.setForeground(new Color(100, 100, 100));
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2; gbc.insets = new Insets(10, 0, 0, 0);
+        panelFormulario.add(lblAyudaContrasena, gbc);
     }
 
     /**
@@ -978,8 +997,21 @@ public class FormularioRegistroCompleto extends JFrame {
                 usuario.setTelefono(txtTelefono.getText().trim());
                 usuario.setContrasena(new String(txtContrasena.getPassword()));
                 
-                // Registrar usuario y características faciales
-                return servicioUsuario.registrarUsuarioCompleto(usuario, muestrasFaciales);
+                // 🔄 Registrar usuario con o sin características faciales
+                List<BufferedImage> muestrasValidas = null;
+                
+                // Filtrar solo muestras válidas si existen
+                if (muestrasFaciales != null && !muestrasFaciales.isEmpty()) {
+                    muestrasValidas = muestrasFaciales.stream()
+                        .filter(m -> m != null)
+                        .collect(java.util.stream.Collectors.toList());
+                    
+                    System.out.println("INFO: Registrando con " + muestrasValidas.size() + " muestras faciales");
+                } else {
+                    System.out.println("INFO: Registrando SIN muestras faciales");
+                }
+                
+                return servicioUsuario.registrarUsuarioCompleto(usuario, muestrasValidas);
             }
             
             @Override
@@ -993,7 +1025,28 @@ public class FormularioRegistroCompleto extends JFrame {
                         btnRegistrar.setEnabled(true);
                     }
                 } catch (Exception e) {
-                    mostrarError("Error registrando usuario: " + e.getMessage());
+                    String mensajeError = "Error registrando usuario: " + e.getMessage();
+                    
+                    // Mejorar mensajes de error específicos
+                    if (e.getMessage().contains("Contraseña no cumple con la política")) {
+                        mensajeError = "❌ CONTRASEÑA NO SEGURA\n\n" +
+                                     "La contraseña debe cumplir con los siguientes requisitos:\n" +
+                                     "• Al menos 8 caracteres\n" +
+                                     "• Una letra minúscula (a-z)\n" +
+                                     "• Una letra mayúscula (A-Z)\n" +
+                                     "• Un número (0-9)\n" +
+                                     "• Un carácter especial (!@#$%^&*)\n" +
+                                     "• No puede ser una contraseña común\n\n" +
+                                     "Ejemplo: MiContra123!";
+                    } else if (e.getMessage().contains("cifrar contraseña")) {
+                        mensajeError = "❌ Error de seguridad: La contraseña no es lo suficientemente segura";
+                    } else if (e.getMessage().contains("base de datos") || e.getMessage().contains("SQL")) {
+                        mensajeError = "❌ Error de conexión con la base de datos. Intente nuevamente";
+                    } else if (e.getMessage().contains("usuario ya existe")) {
+                        mensajeError = "❌ El nombre de usuario ya está en uso. Elija otro nombre";
+                    }
+                    
+                    mostrarError(mensajeError);
                     btnRegistrar.setEnabled(true);
                 }
             }
@@ -1066,8 +1119,10 @@ public class FormularioRegistroCompleto extends JFrame {
             return false;
         }
         
-        if (contrasena.length() < 6) {
-            mostrarError("La contraseña debe tener al menos 6 caracteres");
+        // Validar política de contraseñas (antes de cifrarla)
+        String mensajeValidacion = validarPoliticaContrasena(contrasena);
+        if (mensajeValidacion != null) {
+            mostrarError(mensajeValidacion);
             txtContrasena.requestFocus();
             return false;
         }
@@ -1078,22 +1133,35 @@ public class FormularioRegistroCompleto extends JFrame {
             return false;
         }
         
-        // Validar muestras faciales con debug
-        System.out.println("DEBUG: Validando muestras - Cantidad: " + muestrasFaciales.size() + 
-                          ", Requeridas: " + MUESTRAS_REQUERIDAS);
-        
+        // 🔧 RECONOCIMIENTO FACIAL OPCIONAL - No bloquea el registro
+        // Mostrar advertencia si no hay muestras suficientes pero permitir continuar
         if (muestrasFaciales == null || muestrasFaciales.size() < MUESTRAS_REQUERIDAS) {
-            String mensaje = "Debe capturar " + MUESTRAS_REQUERIDAS + " muestras faciales.\n" +
-                           "Muestras actuales: " + (muestrasFaciales != null ? muestrasFaciales.size() : 0);
-            mostrarError(mensaje);
-            return false;
-        }
-        
-        // Validar que las muestras no sean nulas
-        long muestrasValidas = muestrasFaciales.stream().filter(m -> m != null).count();
-        if (muestrasValidas < MUESTRAS_REQUERIDAS) {
-            mostrarError("Algunas muestras faciales son inválidas. Intente capturar nuevamente.");
-            return false;
+            System.out.println("AVISO: Registro sin reconocimiento facial - Muestras: " + 
+                             (muestrasFaciales != null ? muestrasFaciales.size() : 0) + 
+                             "/" + MUESTRAS_REQUERIDAS);
+            
+            // Mostrar diálogo informativo pero no bloquear
+            int opcion = JOptionPane.showConfirmDialog(
+                this,
+                "⚠️ REGISTRO SIN RECONOCIMIENTO FACIAL\n\n" +
+                "No has capturado las muestras faciales requeridas.\n" +
+                "Muestras actuales: " + (muestrasFaciales != null ? muestrasFaciales.size() : 0) + "/" + MUESTRAS_REQUERIDAS + "\n\n" +
+                "¿Deseas continuar con el registro sin reconocimiento facial?\n" +
+                "(Podrás configurarlo después desde tu perfil)",
+                "Confirmación de Registro",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (opcion != JOptionPane.YES_OPTION) {
+                return false; // Usuario decidió no continuar
+            }
+        } else {
+            // Validar que las muestras existentes no sean nulas
+            long muestrasValidas = muestrasFaciales.stream().filter(m -> m != null).count();
+            if (muestrasValidas < muestrasFaciales.size()) {
+                System.out.println("AVISO: Algunas muestras son inválidas, se registrará con las válidas");
+            }
         }
         
         System.out.println("DEBUG: Validación exitosa - Todas las muestras son válidas");
@@ -1104,19 +1172,28 @@ public class FormularioRegistroCompleto extends JFrame {
      * 🔄 Validar y habilitar botón de registro
      */
     private void validarYHabilitarRegistro() {
+        // ✅ Validación basada solo en campos obligatorios (sin reconocimiento facial)
         boolean formValido = !txtNombreUsuario.getText().trim().isEmpty() &&
                            !txtNombreCompleto.getText().trim().isEmpty() &&
                            !txtCorreo.getText().trim().isEmpty() &&
                            txtContrasena.getPassword().length >= 6 &&
-                           new String(txtContrasena.getPassword()).equals(new String(txtConfirmarContrasena.getPassword())) &&
-                           muestrasFaciales.size() >= MUESTRAS_REQUERIDAS;
+                           new String(txtContrasena.getPassword()).equals(new String(txtConfirmarContrasena.getPassword()));
+                           // 🚫 ELIMINADO: && muestrasFaciales.size() >= MUESTRAS_REQUERIDAS
         
         btnRegistrar.setEnabled(formValido);
         
         if (formValido) {
             btnRegistrar.setBackground(COLOR_SECUNDARIO);
             btnRegistrar.setForeground(Color.BLACK); // Asegurar texto negro
-            actualizarEstado(">> Listo para registrar - Haga clic en Registrar");
+            
+            // Mensaje dinámico según si tiene muestras faciales
+            String estado;
+            if (muestrasFaciales != null && muestrasFaciales.size() >= MUESTRAS_REQUERIDAS) {
+                estado = "✅ Listo para registrar CON reconocimiento facial";
+            } else {
+                estado = "✅ Listo para registrar SIN reconocimiento facial (opcional)";
+            }
+            actualizarEstado(estado);
         }
     }
 
@@ -1176,7 +1253,74 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 📊 Actualizar estado
+     * � Validar política de contraseñas
+     */
+    private String validarPoliticaContrasena(String contrasena) {
+        if (contrasena == null || contrasena.isEmpty()) {
+            return "La contraseña es requerida";
+        }
+        
+        if (contrasena.length() < 8) {
+            return "La contraseña debe tener al menos 8 caracteres";
+        }
+        
+        if (contrasena.length() > 128) {
+            return "La contraseña no puede tener más de 128 caracteres";
+        }
+        
+        // Verificar que tenga al menos una letra minúscula
+        if (!contrasena.matches(".*[a-z].*")) {
+            return "La contraseña debe contener al menos una letra minúscula";
+        }
+        
+        // Verificar que tenga al menos una letra mayúscula
+        if (!contrasena.matches(".*[A-Z].*")) {
+            return "La contraseña debe contener al menos una letra mayúscula";
+        }
+        
+        // Verificar que tenga al menos un número
+        if (!contrasena.matches(".*[0-9].*")) {
+            return "La contraseña debe contener al menos un número";
+        }
+        
+        // Verificar que tenga al menos un carácter especial
+        if (!contrasena.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
+            return "La contraseña debe contener al menos un carácter especial (!@#$%^&*()_+-=[]{}|;':\"\\\\,.<>?)";
+        }
+        
+        // Verificar contraseñas comunes (las más básicas)
+        String[] contrasenasComunes = {
+            "123456", "password", "123456789", "12345678", "12345", "1234567", "qwerty",
+            "abc123", "password123", "admin", "administrator", "123123", "welcome",
+            "login", "guest", "hello", "default", "changeme", "test", "temp"
+        };
+        
+        String contrasenaLower = contrasena.toLowerCase();
+        for (String comun : contrasenasComunes) {
+            if (contrasenaLower.equals(comun)) {
+                return "La contraseña es demasiado común. Use una contraseña más segura";
+            }
+        }
+        
+        // Verificar patrones simples
+        if (contrasena.matches("^[0-9]+$")) {
+            return "La contraseña no puede ser solo números";
+        }
+        
+        if (contrasena.matches("^[a-zA-Z]+$")) {
+            return "La contraseña no puede ser solo letras";
+        }
+        
+        // Verificar secuencias repetitivas
+        if (contrasena.matches(".*(.)\\1{2,}.*")) {
+            return "La contraseña no puede tener más de 2 caracteres iguales consecutivos";
+        }
+        
+        return null; // Contraseña válida
+    }
+
+    /**
+     * �📊 Actualizar estado
      */
     private void actualizarEstado(String mensaje) {
         SwingUtilities.invokeLater(() -> {
