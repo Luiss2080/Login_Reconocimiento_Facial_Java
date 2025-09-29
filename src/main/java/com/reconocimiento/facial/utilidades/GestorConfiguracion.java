@@ -247,7 +247,7 @@ public class GestorConfiguracion {
     private static String obtenerValorSugerido(String clave) {
         switch (clave) {
             case "bd.host": return "localhost";
-            case "bd.puerto": return "3306";
+            case "bd.puerto": return "3307";
             case "bd.usuario": return "root";
             case "bd.password": return "";
             case "bd.nombre": return "sistema_reconocimiento_facial";

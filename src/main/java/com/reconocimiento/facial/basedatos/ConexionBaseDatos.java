@@ -23,7 +23,7 @@ public class ConexionBaseDatos {
 
     // Configuración de la base de datos (cargada desde sistema.properties)
     private static final String DB_HOST = GestorConfiguracion.obtenerString("bd.host", "localhost");
-    private static final String DB_PUERTO = GestorConfiguracion.obtenerString("bd.puerto", "3306");
+    private static final String DB_PUERTO = GestorConfiguracion.obtenerString("bd.puerto", "3307");
     private static final String DB_NOMBRE = GestorConfiguracion.obtenerString("bd.nombre", "sistema_reconocimiento_facial");
     private static final String DB_USER = GestorConfiguracion.obtenerString("bd.usuario", "root");
     private static final String DB_PASSWORD = GestorConfiguracion.obtenerString("bd.password", "");

@@ -18,7 +18,7 @@ public class ProbadorConexion {
         
         // Configuraciones por defecto
         String host = "localhost";
-        String puerto = "3306";
+        String puerto = "3307";
         String baseDatos = "sistema_reconocimiento_facial";
         String usuario = "root";
         String password = ""; // Cambiar por tu contraseña

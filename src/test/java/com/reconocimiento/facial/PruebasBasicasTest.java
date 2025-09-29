@@ -152,8 +152,8 @@ public class PruebasBasicasTest {
         String host = GestorConfiguracion.obtenerString("bd.host", "localhost");
         assertEquals("localhost", host, "Debe retornar valor por defecto");
         
-        int puerto = GestorConfiguracion.obtenerInt("bd.puerto", 3306);
-        assertEquals(3306, puerto, "Debe retornar puerto por defecto");
+        int puerto = GestorConfiguracion.obtenerInt("bd.puerto", 3307);
+        assertEquals(3307, puerto, "Debe retornar puerto por defecto");
         
         double confianza = GestorConfiguracion.obtenerDouble("seguridad.confianza", 0.85);
         assertEquals(0.85, confianza, 0.001, "Debe retornar confianza por defecto");

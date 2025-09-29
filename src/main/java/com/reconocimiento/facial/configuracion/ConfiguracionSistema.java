@@ -31,7 +31,7 @@ public class ConfiguracionSistema {
     
     // Configuraciones de base de datos por defecto
     private static final String BD_HOST_DEFAULT = "localhost";
-    private static final String BD_PUERTO_DEFAULT = "3306";
+    private static final String BD_PUERTO_DEFAULT = "3307";
     private static final String BD_NOMBRE_DEFAULT = "sistema_reconocimiento_facial";
     private static final String BD_USUARIO_DEFAULT = "root";
     private static final String BD_PASSWORD_DEFAULT = "";

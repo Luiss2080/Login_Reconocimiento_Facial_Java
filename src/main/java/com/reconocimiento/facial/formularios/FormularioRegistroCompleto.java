@@ -97,6 +97,9 @@ public class FormularioRegistroCompleto extends JFrame {
             // Configurar ventana
             configurarVentana();
             
+            // Asegurar estado inicial limpio
+            inicializarEstadoLimpio();
+            
             mostrarMensajeBienvenida();
             
         } catch (Exception e) {
@@ -282,15 +285,40 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * Crear panel de captura facial
+     * Crear panel de captura facial con scroll
      */
     private void crearPanelCaptura() {
+        // Panel interno que contendrá todos los componentes con más espacio
+        JPanel panelInternoCaptura = new JPanel();
+        panelInternoCaptura.setLayout(new BoxLayout(panelInternoCaptura, BoxLayout.Y_AXIS));
+        panelInternoCaptura.setBackground(COLOR_FONDO);
+        panelInternoCaptura.setBorder(BorderFactory.createEmptyBorder(30, 25, 30, 25));
+        
+        // Permitir que el panel se redimensione según su contenido
+        panelInternoCaptura.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Crear el JScrollPane que contendrá el panel interno con estilo mejorado
+        JScrollPane scrollCaptura = new JScrollPane(panelInternoCaptura);
+        scrollCaptura.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollCaptura.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollCaptura.setBorder(BorderFactory.createLineBorder(COLOR_BORDE, 1));
+        scrollCaptura.getVerticalScrollBar().setUnitIncrement(16);
+        scrollCaptura.getVerticalScrollBar().setBlockIncrement(50);
+        scrollCaptura.setBackground(COLOR_FONDO);
+        scrollCaptura.getViewport().setBackground(COLOR_FONDO);
+        
+        // Personalizar apariencia del scroll
+        scrollCaptura.getVerticalScrollBar().setPreferredSize(new Dimension(12, 0));
+        scrollCaptura.getVerticalScrollBar().setBackground(new Color(240, 240, 240));
+        scrollCaptura.getVerticalScrollBar().setBorder(BorderFactory.createEmptyBorder());
+        
+        // Mejorar la suavidad del scroll
+        scrollCaptura.setWheelScrollingEnabled(true);
+        
+        // Panel principal que contendrá el scroll
         panelCaptura = new JPanel(new BorderLayout());
         panelCaptura.setBackground(COLOR_FONDO);
-        panelCaptura.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDE, 1),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
+        panelCaptura.add(scrollCaptura, BorderLayout.CENTER);
         
         // Título de la sección
         JLabel lblTituloCaptura = new JLabel("Captura Biométrica");
@@ -306,20 +334,23 @@ public class FormularioRegistroCompleto extends JFrame {
         // Crear contenedor de video moderno
         crearContenedorVideoModerno(panelCamara);
         
-        // Panel de botones de cámara
-        JPanel panelBotonesCamara = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        // Panel de botones de cámara - IGUAL AL LOGIN (BoxLayout vertical)
+        JPanel panelBotonesCamara = new JPanel();
+        panelBotonesCamara.setLayout(new BoxLayout(panelBotonesCamara, BoxLayout.Y_AXIS));
         panelBotonesCamara.setBackground(COLOR_FONDO);
+        panelBotonesCamara.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         // Botón Activar Cámara PREMIUM - Estilo Login
-        btnActivarCamara = new JButton("ACTIVAR CAMARA");
+        btnActivarCamara = new JButton("▶ ACTIVAR CÁMARA");
         btnActivarCamara.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnActivarCamara.setBackground(new Color(187, 222, 251)); // Azul muy claro
         btnActivarCamara.setForeground(Color.BLACK);
-        btnActivarCamara.setPreferredSize(new Dimension(200, 45));
-        btnActivarCamara.setMaximumSize(new Dimension(200, 45));
+        btnActivarCamara.setPreferredSize(new Dimension(300, 45));
+        btnActivarCamara.setMaximumSize(new Dimension(300, 45));
         btnActivarCamara.setFocusPainted(false);
         btnActivarCamara.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         btnActivarCamara.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnActivarCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Efectos hover premium para cámara
         btnActivarCamara.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -337,16 +368,19 @@ public class FormularioRegistroCompleto extends JFrame {
             }
         });
         
-        // Botón Capturar Muestra PREMIUM
-        btnCapturarMuestra = new JButton("CAPTURAR MUESTRA");
+        // Botón Capturar Muestra PREMIUM - Más visible
+        btnCapturarMuestra = new JButton("📸 CAPTURAR ROSTRO");
         btnCapturarMuestra.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCapturarMuestra.setBackground(new Color(200, 230, 201)); // Verde claro
         btnCapturarMuestra.setForeground(Color.BLACK);
-        btnCapturarMuestra.setPreferredSize(new Dimension(170, 45));
+        btnCapturarMuestra.setPreferredSize(new Dimension(300, 45));
+        btnCapturarMuestra.setMaximumSize(new Dimension(300, 45));
         btnCapturarMuestra.setFocusPainted(false);
-        btnCapturarMuestra.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnCapturarMuestra.setBorder(BorderFactory.createRaisedBevelBorder());
         btnCapturarMuestra.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCapturarMuestra.setEnabled(false);
+        btnCapturarMuestra.setVisible(true);
+        btnCapturarMuestra.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Efectos hover premium para captura
         btnCapturarMuestra.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -363,7 +397,13 @@ public class FormularioRegistroCompleto extends JFrame {
         });
         
         panelBotonesCamara.add(btnActivarCamara);
+        panelBotonesCamara.add(Box.createVerticalStrut(10)); // Espacio entre botones como en login
         panelBotonesCamara.add(btnCapturarMuestra);
+        
+        // Debug: Verificar que los botones se agreguen correctamente
+        System.out.println("DEBUG: Botones agregados al panel - Activar: " + btnActivarCamara.getText() + 
+                          ", Capturar: " + btnCapturarMuestra.getText() + 
+                          ", Habilitado: " + btnCapturarMuestra.isEnabled());
         
         // Panel de progreso
         JPanel panelProgreso = new JPanel(new BorderLayout());
@@ -377,7 +417,7 @@ public class FormularioRegistroCompleto extends JFrame {
         progressCaptura.setBackground(COLOR_FONDO);
         progressCaptura.setForeground(COLOR_ACENTO);
         
-        lblMuestrasCapturadas = new JLabel("Capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro");
+        lblMuestrasCapturadas = new JLabel("<html><center>📷 Primero active la cámara, luego capture " + MUESTRAS_REQUERIDAS + " imágenes de su rostro<br><b>El botón de captura aparecerá cuando la cámara esté activa</b></center></html>");
         lblMuestrasCapturadas.setFont(FONT_LABEL);
         lblMuestrasCapturadas.setForeground(new Color(100, 100, 100));
         lblMuestrasCapturadas.setHorizontalAlignment(SwingConstants.CENTER);
@@ -390,15 +430,27 @@ public class FormularioRegistroCompleto extends JFrame {
         panelInfo.add(progressCaptura, BorderLayout.CENTER);
         panelInfo.add(lblMuestrasCapturadas, BorderLayout.SOUTH);
         
-        panelCaptura.add(lblTituloCaptura, BorderLayout.NORTH);
-        panelCaptura.add(panelCamara, BorderLayout.CENTER);
+        // Agregar componentes en orden vertical (BoxLayout) al panel interno
+        lblTituloCaptura.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelInternoCaptura.add(lblTituloCaptura);
+        panelInternoCaptura.add(Box.createVerticalStrut(10));
         
-        JPanel panelSur = new JPanel(new BorderLayout());
-        panelSur.setBackground(COLOR_FONDO);
-        panelSur.add(panelBotonesCamara, BorderLayout.CENTER);
-        panelSur.add(panelInfo, BorderLayout.SOUTH);
+        // Agregar contenedor de video centrado
+        panelCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelInternoCaptura.add(panelCamara);
+        panelInternoCaptura.add(Box.createVerticalStrut(10));
         
-        panelCaptura.add(panelSur, BorderLayout.SOUTH);
+        // Agregar panel de botones centrado
+        panelBotonesCamara.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelInternoCaptura.add(panelBotonesCamara);
+        panelInternoCaptura.add(Box.createVerticalStrut(10));
+        
+        // Agregar panel de información centrado
+        panelInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelInternoCaptura.add(panelInfo);
+        
+        // Agregar espacio adicional al final para mejor apariencia del scroll
+        panelInternoCaptura.add(Box.createVerticalStrut(20));
     }
 
     /**
@@ -522,11 +574,12 @@ public class FormularioRegistroCompleto extends JFrame {
         // Crear contenedor principal de video - MAS GRANDE Y VISIBLE
         panelVideoContainer = new JPanel(new BorderLayout());
         panelVideoContainer.setBackground(new Color(44, 62, 80));
+        panelVideoContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
         panelVideoContainer.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(52, 73, 94), 2),
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+            BorderFactory.createLineBorder(new Color(149, 165, 166), 2),
+            BorderFactory.createEmptyBorder(3, 3, 3, 3)
         ));
-        // Tamaño más grande y fijo
+        // Tamaño IGUAL al login para consistencia visual - 280x180
         panelVideoContainer.setPreferredSize(new Dimension(350, 250));
         panelVideoContainer.setMinimumSize(new Dimension(350, 250));
         panelVideoContainer.setMaximumSize(new Dimension(350, 250));
@@ -545,7 +598,7 @@ public class FormularioRegistroCompleto extends JFrame {
         
         panelVideoContainer.add(lblVistaPrevia, BorderLayout.CENTER);
         
-        // Agregar al panel padre con posición específica
+        // Agregar al panel padre (el contenedor se agregará manualmente en crearPanelCaptura)
         panelPadre.add(panelVideoContainer, BorderLayout.CENTER);
         
         // Forzar repaint
@@ -640,7 +693,41 @@ public class FormularioRegistroCompleto extends JFrame {
     }
 
     /**
-     * 💬 Mostrar mensaje de bienvenida
+     * � Inicializar estado limpio del formulario
+     */
+    private void inicializarEstadoLimpio() {
+        // Limpiar datos existentes
+        if (muestrasFaciales != null) {
+            muestrasFaciales.clear();
+        }
+        
+        // Resetear componentes de captura
+        if (progressCaptura != null) {
+            progressCaptura.setValue(0);
+            progressCaptura.setString("0 / " + MUESTRAS_REQUERIDAS + " muestras");
+        }
+        
+        // Resetear botones
+        if (btnCapturarMuestra != null) {
+            btnCapturarMuestra.setEnabled(false);
+            btnCapturarMuestra.setText("📸 CAPTURAR ROSTRO");
+            btnCapturarMuestra.setBackground(new Color(200, 230, 201));
+            btnCapturarMuestra.setForeground(Color.BLACK);
+        }
+        
+        if (btnRegistrar != null) {
+            btnRegistrar.setEnabled(false);
+        }
+        
+        // Resetear estado de cámara
+        camaraActiva = false;
+        
+        System.out.println("DEBUG: Estado inicial limpio establecido - Muestras: " + 
+                          (muestrasFaciales != null ? muestrasFaciales.size() : "null"));
+    }
+
+    /**
+     * �💬 Mostrar mensaje de bienvenida
      */
     private void mostrarMensajeBienvenida() {
         actualizarEstado("Bienvenido al registro del sistema");
@@ -730,12 +817,35 @@ public class FormularioRegistroCompleto extends JFrame {
                             btnActivarCamara.setText("CAMARA ACTIVA");
                             btnActivarCamara.setBackground(new Color(46, 204, 113)); // Verde exitoso
                             btnActivarCamara.setEnabled(false);
+                            
+                            // Habilitar y hacer más visible el botón de captura
                             btnCapturarMuestra.setEnabled(true);
+                            btnCapturarMuestra.setVisible(true);
+                            btnCapturarMuestra.setText("📸 CAPTURAR ROSTRO");
+                            btnCapturarMuestra.setBackground(new Color(76, 175, 80)); // Verde más llamativo
+                            btnCapturarMuestra.setForeground(Color.WHITE);
+                            
+                            // Debug: Verificar estado del botón
+                            System.out.println("DEBUG: Botón captura habilitado - Enabled: " + 
+                                             btnCapturarMuestra.isEnabled() + ", Visible: " + 
+                                             btnCapturarMuestra.isVisible() + ", Texto: " + 
+                                             btnCapturarMuestra.getText());
+                            
+                            // Forzar repaint del panel con scroll
+                            panelCaptura.revalidate();
+                            panelCaptura.repaint();
+                            SwingUtilities.invokeLater(() -> {
+                                panelCaptura.getComponent(0).revalidate(); // Revalidar el scroll
+                            });
+                            
+                            // Actualizar mensaje instructivo
+                            lblMuestrasCapturadas.setText("<html><center>📸 <b>¡Cámara lista!</b><br>Use el botón 'CAPTURAR ROSTRO' para tomar " + MUESTRAS_REQUERIDAS + " fotos<br>Mire directamente a la cámara para mejores resultados</center></html>");
+                            lblMuestrasCapturadas.setForeground(new Color(46, 125, 50)); // Verde oscuro
                             
                             // Iniciar stream de video HD
                             iniciarStreamVideoHD();
                             
-                            actualizarEstado("Camara activa - Vista previa habilitada");
+                            actualizarEstado("✅ Cámara activa - Use el botón CAPTURAR ROSTRO");
                             
                             System.out.println("REGISTRO: Cámara activada exitosamente");
                         } else {
@@ -808,9 +918,14 @@ public class FormularioRegistroCompleto extends JFrame {
                         
                         if (muestrasFaciales.size() >= MUESTRAS_REQUERIDAS) {
                             btnCapturarMuestra.setEnabled(false);
-                            btnCapturarMuestra.setText("CAPTURAS COMPLETAS");
-                            actualizarEstado("Todas las muestras capturadas correctamente");
+                            btnCapturarMuestra.setText("✅ CAPTURAS COMPLETAS");
+                            btnCapturarMuestra.setBackground(new Color(46, 204, 113)); // Verde éxito
+                            btnCapturarMuestra.setForeground(Color.WHITE);
+                            actualizarEstado("✅ Todas las muestras capturadas correctamente");
                             validarYHabilitarRegistro();
+                        } else {
+                            // Actualizar el texto del botón con el progreso
+                            btnCapturarMuestra.setText("📸 CAPTURAR (" + muestrasFaciales.size() + "/" + MUESTRAS_REQUERIDAS + ")");
                         }
                     } else {
                         mostrarError("Error capturando imagen");
@@ -963,12 +1078,25 @@ public class FormularioRegistroCompleto extends JFrame {
             return false;
         }
         
-        // Validar muestras faciales
-        if (muestrasFaciales.size() < MUESTRAS_REQUERIDAS) {
-            mostrarError("Debe capturar " + MUESTRAS_REQUERIDAS + " muestras faciales");
+        // Validar muestras faciales con debug
+        System.out.println("DEBUG: Validando muestras - Cantidad: " + muestrasFaciales.size() + 
+                          ", Requeridas: " + MUESTRAS_REQUERIDAS);
+        
+        if (muestrasFaciales == null || muestrasFaciales.size() < MUESTRAS_REQUERIDAS) {
+            String mensaje = "Debe capturar " + MUESTRAS_REQUERIDAS + " muestras faciales.\n" +
+                           "Muestras actuales: " + (muestrasFaciales != null ? muestrasFaciales.size() : 0);
+            mostrarError(mensaje);
             return false;
         }
         
+        // Validar que las muestras no sean nulas
+        long muestrasValidas = muestrasFaciales.stream().filter(m -> m != null).count();
+        if (muestrasValidas < MUESTRAS_REQUERIDAS) {
+            mostrarError("Algunas muestras faciales son inválidas. Intente capturar nuevamente.");
+            return false;
+        }
+        
+        System.out.println("DEBUG: Validación exitosa - Todas las muestras son válidas");
         return true;
     }
 
