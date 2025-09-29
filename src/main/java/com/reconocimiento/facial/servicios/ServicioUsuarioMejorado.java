@@ -125,7 +125,7 @@ public class ServicioUsuarioMejorado {
      */
     public Optional<Usuario> autenticarConReconocimientoFacial(BufferedImage imagenRostro) {
         try {
-            System.out.println("📷 Iniciando autenticación por reconocimiento facial con OpenCV");
+            System.out.println("📷 Iniciando autenticación por reconocimiento facial (comparación de imágenes)");
             
             if (imagenRostro == null) {
                 System.err.println("❌ Imagen de rostro es null");
@@ -133,38 +133,44 @@ public class ServicioUsuarioMejorado {
                 return Optional.empty();
             }
             
-            // Intentar reconocimiento con OpenCV primero (algoritmos avanzados)
-            Optional<Usuario> usuarioReconocido = Optional.empty();
+            // Método simple: comparar la imagen actual con las guardadas en la base de datos
+            ReconocimientoFacialSimple reconocimientoSimple = new ReconocimientoFacialSimple();
+            Optional<Usuario> usuarioReconocido = reconocimientoSimple.autenticarPorImagen(imagenRostro);
             double confianzaFinal = 0.0;
             String metodoUsado = "";
             
-            if (integradorOpenCV.isSistemaInicializado()) {
-                System.out.println("🔧 Intentando reconocimiento con OpenCV...");
+            if (usuarioReconocido.isPresent()) {
+                confianzaFinal = 0.85; // Confianza fija para simulación
+                metodoUsado = "Comparación de imágenes (85%)";
+                System.out.println("✅ Reconocimiento por comparación exitoso: " + usuarioReconocido.get().getNombreUsuario());
+            } else {
+                System.out.println("❌ No se encontró coincidencia en las imágenes guardadas");
                 
-                ResultadoAutenticacionFacial resultadoOpenCV = integradorOpenCV.autenticarUsuarioFacial(imagenRostro);
-                
-                if (resultadoOpenCV.isAutenticado()) {
-                    // Buscar usuario en base de datos
-                    usuarioReconocido = usuarioDAO.buscarPorNombreUsuario(resultadoOpenCV.getNombreUsuario());
-                    confianzaFinal = resultadoOpenCV.getConfianza() / 100.0; // Convertir a decimal
-                    metodoUsado = "OpenCV (" + String.format("%.2f%%", resultadoOpenCV.getConfianza()) + ")";
+                // Si no encuentra coincidencia, intentar con OpenCV como respaldo
+                if (integradorOpenCV.isSistemaInicializado()) {
+                    System.out.println("🔧 Intentando reconocimiento con OpenCV como respaldo...");
                     
-                    System.out.println("✅ Reconocimiento OpenCV exitoso: " + resultadoOpenCV.getNombreUsuario() + 
-                                     " - " + resultadoOpenCV.getMensaje());
+                    ResultadoAutenticacionFacial resultadoOpenCV = integradorOpenCV.autenticarUsuarioFacial(imagenRostro);
+                    
+                    if (resultadoOpenCV.isAutenticado()) {
+                        usuarioReconocido = usuarioDAO.buscarPorNombreUsuario(resultadoOpenCV.getNombreUsuario());
+                        confianzaFinal = resultadoOpenCV.getConfianza() / 100.0;
+                        metodoUsado = "OpenCV (" + String.format("%.2f%%", resultadoOpenCV.getConfianza()) + ")";
+                        System.out.println("✅ Reconocimiento OpenCV exitoso: " + resultadoOpenCV.getNombreUsuario());
+                    }
                 }
-            }
-            
-            // Si OpenCV no funcionó, intentar con Red Neuronal (backup)
-            if (!usuarioReconocido.isPresent()) {
-                System.out.println("🧠 Intentando reconocimiento con Red Neuronal...");
                 
-                usuarioReconocido = redNeuronal.reconocerUsuario(imagenRostro);
-                
-                if (usuarioReconocido.isPresent()) {
-                    confianzaFinal = redNeuronal.getUltimaConfianza();
-                    metodoUsado = "Red Neuronal (" + String.format("%.2f%%", confianzaFinal * 100) + ")";
+                // Si OpenCV tampoco funciona, intentar Red Neuronal
+                if (!usuarioReconocido.isPresent()) {
+                    System.out.println("🧠 Intentando reconocimiento con Red Neuronal como último recurso...");
                     
-                    System.out.println("✅ Reconocimiento Red Neuronal exitoso: " + usuarioReconocido.get().getNombreUsuario());
+                    usuarioReconocido = redNeuronal.reconocerUsuario(imagenRostro);
+                    
+                    if (usuarioReconocido.isPresent()) {
+                        confianzaFinal = redNeuronal.getUltimaConfianza();
+                        metodoUsado = "Red Neuronal (" + String.format("%.2f%%", confianzaFinal * 100) + ")";
+                        System.out.println("✅ Reconocimiento Red Neuronal exitoso: " + usuarioReconocido.get().getNombreUsuario());
+                    }
                 }
             }
             

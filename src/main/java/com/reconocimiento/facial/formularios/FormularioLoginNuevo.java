@@ -866,8 +866,8 @@ public class FormularioLoginNuevo extends JFrame {
                     throw new Exception("No se pudo capturar la imagen");
                 }
                 
-                // Procesar con red neuronal
-                return redNeuronal.reconocerUsuario(imagenCapturada);
+                // Procesar con servicio mejorado (incluye comparación de imágenes)
+                return servicioUsuario.autenticarConReconocimientoFacial(imagenCapturada);
             }
             
             @Override
