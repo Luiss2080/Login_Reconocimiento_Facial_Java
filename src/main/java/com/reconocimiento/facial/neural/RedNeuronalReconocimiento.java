@@ -8,11 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Optional;
 
-/**
- * 🧠 RED NEURONAL PARA RECONOCIMIENTO FACIAL
- * Implementación completa con extracción de características y comparación biométrica
- * Algoritmo optimizado para reconocimiento facial en tiempo real
- */
+
 public class RedNeuronalReconocimiento {
 
     // ========== CONFIGURACIÓN DE LA RED ==========

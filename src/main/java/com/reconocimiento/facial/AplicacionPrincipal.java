@@ -8,16 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 🚀 APLICACIÓN PRINCIPAL DEL SISTEMA DE RECONOCIMIENTO FACIAL
- * Punto de entrada del sistema optimizado con autenticación dual
- * 
- * CARACTERÍSTICAS PRINCIPALES:
- * ✅ Autenticación por credenciales y reconocimiento facial
- * ✅ Base de datos MySQL integrada
- * ✅ Red neuronal para procesamiento de imágenes
- * ✅ Sistema de configuración centralizada
- * ✅ Auditoría completa de accesos
- * ✅ Interfaz gráfica moderna
+
  */
 public class AplicacionPrincipal {
 
